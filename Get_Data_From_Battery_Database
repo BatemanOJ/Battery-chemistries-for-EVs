@@ -1,0 +1,25 @@
+import pandas as pd
+
+
+from Get_Data_From_Cell import Get_Data_From_Cell # row -3, column -2
+from Get_Data_From_Cell import Get_Data_EVs # row -2, colum -1
+
+# Load the Excel file
+# battery_database = pd.read_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="RAW DATA")
+
+# # Convert each row into a list
+# batteries_as_arrays = battery_database.values.tolist()
+
+battery_index = 11  # row -3
+stat_index = 17  # column -2
+
+cell_data = Get_Data_From_Cell(battery_index, stat_index)
+
+
+# Calculate the smallest number of cells needed
+EV_required_capacity = Get_Data_EVs(7, 3)
+cell_energy_capacity = Get_Data_EVs(33, 3)
+print(EV_required_capacity, cell_energy_capacity)
+
+min_cells = EV_required_capacity/cell_energy_capacity
+
