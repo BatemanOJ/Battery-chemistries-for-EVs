@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-def Get_Data_From_Cell(row_index, column_index):
+def Get_Data_Battery(row_index, column_index):
 
     battery_database = pd.read_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="RAW DATA")
 
