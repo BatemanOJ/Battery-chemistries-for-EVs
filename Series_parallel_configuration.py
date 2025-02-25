@@ -16,8 +16,9 @@ def Series_Parallel_Config_EV(EV_number): #, no_cells_series, no_cells_parallel,
 
     min_cell_voltage = Get_Data_EVs(31, EV_number)
     max_cell_voltage = Get_Data_EVs(29, EV_number)
+    voltage_for_peak_power = Get_Data_EVs(41, EV_number)
 
-    peak_discharge_power = 190512#Get_Data_EVs(12, EV_number)
+    peak_discharge_power = Get_Data_EVs(12, EV_number) #190512
 
     peak_cell_current = Get_Data_EVs(34, EV_number)
     nominal_pack_capacity = Get_Data_EVs(19, EV_number)
@@ -42,13 +43,13 @@ def Series_Parallel_Config_EV(EV_number): #, no_cells_series, no_cells_parallel,
     parallel_values = []
 
     while no_cells_parallel <= max_cells_parallel:
-        if (peak_cell_current * no_cells_parallel * min_cell_voltage * no_cells_series) < peak_discharge_power:
+        if (peak_cell_current * no_cells_parallel * voltage_for_peak_power * no_cells_series) < peak_discharge_power:
             
-            result = peak_cell_current * no_cells_parallel * min_cell_voltage * no_cells_series
+            result = peak_cell_current * no_cells_parallel * voltage_for_peak_power * no_cells_series
             # print(peak_discharge_power, result, no_cells_parallel, no_cells_series)
 
-            if peak_discharge_power - (peak_cell_current * no_cells_parallel * min_cell_voltage * no_cells_series) < \
-            peak_cell_current * no_cells_parallel * ((min_cell_voltage * max_cells_series) - (min_cell_voltage * min_cells_series)):
+            if peak_discharge_power - (peak_cell_current * no_cells_parallel * voltage_for_peak_power * no_cells_series) < \
+            peak_cell_current * no_cells_parallel * ((voltage_for_peak_power * max_cells_series) - (voltage_for_peak_power * min_cells_series)):
 
                 if no_cells_series < max_cells_series:
                     no_cells_series += 1

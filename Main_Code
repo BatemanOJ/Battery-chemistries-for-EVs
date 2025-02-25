@@ -19,7 +19,7 @@ stat_index = 17  # column -2
 cell_data = Get_Data_Battery(battery_index, stat_index)
 
 
-EV_number = 3 # column number of the selected EV
+EV_number = 7 # column number of the selected EV
 
 # Gets the series and parallel cell configuration that meets the capacity and power requirements of the EV
 series_values, parallel_values, max_cells_series = Series_Parallel_Config_EV(EV_number)
