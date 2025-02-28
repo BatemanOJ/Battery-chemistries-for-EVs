@@ -52,8 +52,8 @@ def Series_Parallel_Config_EV(EV_number): #, no_cells_series, no_cells_parallel,
             result = peak_cell_current * no_cells_parallel * voltage_for_peak_power * no_cells_series
             # print(peak_discharge_power, result, no_cells_parallel, no_cells_series)
 
-            if peak_discharge_power - (peak_cell_current * no_cells_parallel * voltage_for_peak_power * no_cells_series) < \
-            peak_cell_current * no_cells_parallel * ((voltage_for_peak_power * max_cells_series) - (voltage_for_peak_power * min_cells_series)):
+            if peak_discharge_power - result < peak_cell_current * no_cells_parallel *\
+            ((voltage_for_peak_power * max_cells_series) - (voltage_for_peak_power * min_cells_series)):
 
                 if no_cells_series < max_cells_series:
                     no_cells_series += 1

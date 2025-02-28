@@ -7,7 +7,7 @@ from Get_Data_From_Cell import Get_Data_Battery_Cell # row -3, column -2
 # from Get_Data_From_Cell import Get_Data_EVs # row -2, colum -1
 from Series_parallel_configuration import Series_Parallel_Config_EV 
 from Range_Estimation import Range_Estimation_for_EVs
-from Get_Data_From_Cell import Get_Battery_Data_Row # gets the row of data and puts it into an array
+from Get_Data_From_Cell import Get_Battery_Data_Row # gets the row of data and puts it into an array -2 on the row number
 from Two_Chemistries import Two_Chemistries
 
 
@@ -39,7 +39,28 @@ series_values, parallel_values, max_cells_series, pack_capacity = Series_Paralle
 range_est_50kph, range_est_100kph = Range_Estimation_for_EVs(pack_capacity, EV_number)
 
 # print(range_est_50kph, range_est_100kph)
+battery_1_index = 1
+battery_2_index = 97
 
-min_battery_1_only, min_battery_2_only = Two_Chemistries(75000, 1, 2, 150000, 250, 475, 360, 500)
+sucess, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
+    Two_Chemistries(battery_1_index, battery_2_index, 75000, 200000, 250, 475, 360, 318)
+# print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+
+while sucess == 0:
+    if battery_2_index == 388:
+        battery_1_index += 1
+        battery_2_index = battery_1_index
+    else:
+        battery_2_index += 1
+    
+    sucess, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
+    Two_Chemistries(battery_1_index, battery_2_index, 75000, 200000, 250, 475, 360, 318)
+
+    print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+    
+    if sucess == 1:
+        print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+        break
+
 # Two_Chemistries(required_cap, battery_1, battery_2, peak_power_required, min_pack_voltage, max_pack_voltage, pack_voltage, max_mass(kg))
-print(min_battery_1_only, min_battery_2_only)
+# print(min_battery_1_only, min_battery_2_only)
