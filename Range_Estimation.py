@@ -22,10 +22,10 @@ def Range_Estimation_for_EVs(battery_cap, EV_number):
     Drag = (0.5 * Cd * A * p * v1 * v1 * d)
     Road_resistance = ((m1+m2+m3) * 9.81 * Rr * d)
     Joules_per_m = Drag + Road_resistance
-    print(Drag, Road_resistance)
+    # print(Drag, Road_resistance)
     
     Wh_per_km = (Joules_per_m/3600000) * 1000000
-    print(f"Wh/km: {Wh_per_km}, Battery Capacity: {battery_cap}")
+    # print(f"Wh/km: {Wh_per_km}, Battery Capacity: {battery_cap}")
     range_est_50kph = battery_cap/(Wh_per_km)
 
     Joules_per_m = (0.5 * Cd * A * p * v2 * v2 * d) + ((m1+m2+m3) * 9.81 * Rr * d)

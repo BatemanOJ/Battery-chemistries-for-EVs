@@ -39,8 +39,6 @@ def Series_Parallel_Config_EV(EV_number): #, no_cells_series, no_cells_parallel,
     no_cells_series = min_cells_series
     no_cells_parallel = min_cells_parallel
 
-    potential_series_values = []
-    potential_parallel_values = []
     series_values = []
     parallel_values = []
 
@@ -96,7 +94,7 @@ def Series_Parallel_Config_EV(EV_number): #, no_cells_series, no_cells_parallel,
     # Finds the minimum number of cells that meet the requirements of the EV, 
     # i.e. if 106s 1p and 106s 2p meet requirements it selects 106s 1p
     while (len(series_values)) > 1:
-        print(series_values, parallel_values)
+        # print(series_values, parallel_values)
 
         if series_values[i] * parallel_values[i] < series_values[i+1] * parallel_values[i+1]:
             del series_values[i+1]
