@@ -43,8 +43,8 @@ def Two_Chemistries(battery_1, battery_2, req_capacity, peak_power_req, min_pack
 
         if mass > max_mass:
             # print(f"Maximum mass exceeded: {mass}, Maximum: {max_mass}")
-            sucess = 0
-            return sucess, no_battery_1, 0, no_battery_2, 0
+            success = 0
+            return success, no_battery_1, 0, no_battery_2, 0
         else:
             print(f"Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
     
@@ -69,8 +69,8 @@ def Two_Chemistries(battery_1, battery_2, req_capacity, peak_power_req, min_pack
             no_battery_2_parallel += 1
 
         if counter_max_voltage > 1000:
-            sucess = 0
-            return sucess, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel
+            success = 0
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel
         counter_max_voltage += 1
 
         check_mass, mass = Check_Mass(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
@@ -127,12 +127,12 @@ def Two_Chemistries(battery_1, battery_2, req_capacity, peak_power_req, min_pack
 
         if check_mass == 0 or check_max_V == 0:
             # print(f"Mass or voltage over limit{mass, max_pack_voltage}")
-            sucess = 0
-            return sucess, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel 
+            success = 0
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel 
 
         print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
     print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
-    sucess = 1
+    success = 1
 
-    return sucess, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel
+    return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel

@@ -42,23 +42,23 @@ range_est_50kph, range_est_100kph = Range_Estimation_for_EVs(pack_capacity, EV_n
 battery_1_index = 1
 battery_2_index = 97
 
-sucess, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
+success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
     Two_Chemistries(battery_1_index, battery_2_index, 75000, 200000, 250, 475, 360, 318)
 # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
 
-while sucess == 0:
+while success == 0:
     if battery_2_index == 388:
         battery_1_index += 1
         battery_2_index = battery_1_index
     else:
         battery_2_index += 1
     
-    sucess, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
+    success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel = \
     Two_Chemistries(battery_1_index, battery_2_index, 75000, 200000, 250, 475, 360, 318)
 
     print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
     
-    if sucess == 1:
+    if success == 1:
         print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
         break
 
