@@ -24,8 +24,6 @@ def Find_Power_Dense_Battery(battery_1, battery_2):
     return battery_1, battery_2, battery_1_Wh, battery_2_Wh
 
 def Find_Power_Dense_Battery_Efficient(battery_1, battery_2):
-
-    print(battery_1[14], battery_1[16])
     
     battery_1_Wh = battery_1[14] * battery_1[16]
     battery_2_Wh = battery_2[14] * battery_2[16]

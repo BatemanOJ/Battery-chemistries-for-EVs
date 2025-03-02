@@ -24,4 +24,15 @@ def Check_Max_V(battery_1_max_V, battery_2_max_V, series_1, series_2, max_pack_V
 
     return check, voltage
 
+def Check_Min_V(battery_1_min_V, battery_2_min_V, series_1, series_2, min_pack_V_allowed):
+    
+    voltage = battery_1_min_V * series_1 + battery_2_min_V * series_2
+
+    if voltage < min_pack_V_allowed:
+        check = 0
+    else:
+        check = 1
+
+    return check, voltage
+
 # req_capacity, peak_power_req, min_pack_V_req, max_pack_V_allowed, pack_voltage, 

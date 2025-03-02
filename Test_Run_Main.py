@@ -73,7 +73,7 @@ while success == 0:
     Two_Chem_Efficient(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 135000, 511000, 459, 289, 540, 200000)
 
     if success == 1:
-        # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+        print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
         
         successful_combinations.append([
             battery_1_index, battery_1_series, battery_1_parallel, 
@@ -83,7 +83,7 @@ while success == 0:
         success = 0
         count_successful_combinations += 1
 
-    if battery_2_index == 379 and battery_1_index == 378:
+    if battery_2_index == 379 and battery_1_index == 5:
         break
     elif battery_2_index == 379:
         battery_1_index += 1
@@ -103,9 +103,11 @@ while success == 0:
 print(count_successful_combinations)
 
 if successful_combinations:
+    max_capacity = max(combo[7] for combo in successful_combinations)
     max_capacity_row = max(successful_combinations, key=lambda x: x[7])
+    print(max_capacity, max_capacity_row)
 
-print(max_capacity_row)
+
 
 
 
