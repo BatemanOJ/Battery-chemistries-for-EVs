@@ -47,7 +47,7 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
         if mass > max_mass:
             # print(f"Maximum mass exceeded: {mass}, Maximum: {max_mass}")
             success = 0
-            return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass
+            return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0
         # else:
             
     # print(f"Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
@@ -74,10 +74,10 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
             no_battery_2_series = no_battery_2_series - math.floor(no_battery_2_series/(1+no_battery_2_parallel))
             no_battery_2_parallel += 1
 
-        if counter_max_voltage > 1000:
-            success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass
-        counter_max_voltage += 1
+        # if counter_max_voltage > 1000:
+        #     success = 0
+        #     return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+        # counter_max_voltage += 1
 
         check_mass, mass = Check_Mass(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         while check_mass == 0:
@@ -95,7 +95,7 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
             
             else: 
                 success = 0
-                return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass
+                return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
             
             check_mass, mass = Check_Mass(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
             
@@ -104,7 +104,7 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
 
         if check_min_V == 0:
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
     
     # print(f"Voltage Check Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}")
 
@@ -146,7 +146,7 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0:
             # print(f"Mass or voltage over limit{mass, max_pack_V}")
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
@@ -193,7 +193,7 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0:
             # print(f"Mass or voltage over limit{mass, max_pack_V}")
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
 
         # print(f"Charging Power 3{peak_charge_power_req, peak_charge_power_generated}")
 
@@ -202,4 +202,4 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
 
     success = 1
 
-    return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass
+    return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated
