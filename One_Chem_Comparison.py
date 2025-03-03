@@ -22,7 +22,7 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
 
     capacity = no_battery_1 * battery_1_Wh
     mass = no_battery_1 * (battery_1[21]/1000)
-    # print(f"Pre-tests, Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+    print(f"Pre-tests, Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
 
     while req_capacity > capacity and mass <= max_mass:
 
@@ -41,10 +41,11 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
         if mass > max_mass:
             # print(f"Maximum mass exceeded: {mass}, Maximum: {max_mass}")
             success = 0
+            print(f"Fail, Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
             return success, no_battery_1, 0, capacity, 0, mass, 0
         # else:
             
-    # print(f"Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+    print(f"Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
 
     max_pack_V = battery_1[15] * no_battery_1
 
@@ -70,6 +71,7 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
             
             else: 
                 success = 0
+                print(f"Fail Mass. Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
                 return success, no_battery_1_series, no_battery_1_parallel, capacity, 0, mass, 0
             
             check_mass, mass = Check_Mass(battery_1[21], 0, no_battery_1_series, 0, no_battery_1_parallel, 0, max_mass)
@@ -79,9 +81,10 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
 
         if check_min_V == 0:
             success = 0
+            print(f"Fail Min-V. Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
             return success, no_battery_1_series, no_battery_1_parallel, capacity, 0, mass, 0
     
-    # print(f"Voltage Check Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}")
+    print(f"Voltage Check Batteries: {no_battery_1_series, no_battery_1_parallel}")
 
     battery_1_peak_power = battery_1[16] * battery_1[19]
 
@@ -106,8 +109,9 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
         check_min_V, min_pack_V = Check_Min_V(battery_1[17], 0, no_battery_1_series, 0, min_pack_V_allowed)
 
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0:
-            # print(f"Mass or voltage over limit{mass, max_pack_V}")
+            print(f"Mass or voltage over limit{mass, max_pack_V, min_pack_V}")
             success = 0
+            # print(f"Fail Mass or V max/min. Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
             return success, no_battery_1_series, no_battery_1_parallel, capacity, 0, mass, 0
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
@@ -118,7 +122,7 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
 
     peak_charge_power_generated = no_battery_1_series * no_battery_1_parallel * battery_1_peak_charge_power
     
-    # print(f"Charging Power 1{peak_charge_power_req, peak_charge_power_generated}")
+    print(f"Discharging Power: {peak_power_req, peak_power_generated}")
 
     while peak_charge_power_req > peak_charge_power_generated and check_mass == 1 and check_max_V == 1:
         
@@ -138,15 +142,16 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
         check_min_V, min_pack_V = Check_Min_V(battery_1[17], 0, no_battery_1_series, 0, min_pack_V_allowed)
 
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0:
-            # print(f"Mass or voltage over limit{mass, max_pack_V}")
+            print(f"Mass or voltage over limit{mass, max_pack_V, min_pack_V}")
             success = 0
+            # print(f"Fail Mass. Capacity: {capacity} Batteries: {no_battery_1}, Mass: {mass}")
             return success, no_battery_1_series, no_battery_1_parallel, capacity, 0, mass, 0
 
         # print(f"Charging Power 3{peak_charge_power_req, peak_charge_power_generated}")
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
-
+    print(f"Charging Power: {peak_charge_power_req, peak_charge_power_generated}")
     success = 1
 
     return success, no_battery_1_series, no_battery_1_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated

@@ -38,6 +38,12 @@ def Two_Chem_Efficient(battery_1, battery_2, req_capacity, peak_power_req, max_p
         elif req_capacity - (no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh) > battery_1_Wh:
             no_battery_1 += 1
         
+        elif req_capacity - (no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh) > 100 * battery_2_Wh:
+            no_battery_2 += 100
+
+        elif req_capacity - (no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh) > 10 * battery_2_Wh:
+            no_battery_2 += 10
+        
         else:
             no_battery_2 += 1
         
