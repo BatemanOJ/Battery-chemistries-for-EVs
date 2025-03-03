@@ -11,6 +11,7 @@ from Range_Estimation import Range_Estimation_for_EVs
 from Get_Data_From_Cell import Get_Battery_Data_Row # gets the row of data and puts it into an array -2 on the row number
 from Two_Chemistries import Two_Chemistries
 from Two_Chem_Efficient import Two_Chem_Efficient
+from Two_Chem_Efficient_Battery_Mass_Not_Pack import Two_Chem_Efficient_Battery_Mass_Not_Pack
 from One_Chem_Comparison import One_Chem_Comparison
 
 
@@ -63,6 +64,65 @@ print("Battery Data Imported")
 #     Two_Chem_Efficient(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 135000, 511000, 459, 289, 540)
 # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
 
+
+#############################################################
+
+# # Checks using pack mass not battery mass
+
+# multi_bat_success = 0
+# count_successful_combinations = 0
+# successful_combinations = []
+
+# start_time = time.time()
+
+# while multi_bat_success == 0:
+
+#     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+#     multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
+#     Two_Chem_Efficient(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 75000, 250000, 459, 289, 520, 160000)
+
+#     if multi_bat_success == 1:
+#         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+        
+#         successful_combinations.append([
+#             battery_1_index, battery_1_series, battery_1_parallel, 
+#             battery_2_index, battery_2_series, battery_2_parallel, 
+#             capacity, discharging_power, mass, charging_power
+#         ])
+#         multi_bat_success = 0
+#         count_successful_combinations += 1
+
+#     if battery_2_index == 379 and battery_1_index == 378:
+#         break
+#     elif battery_2_index == 379:
+#         battery_1_index += 1
+#         battery_2_index = battery_1_index + 1
+#     else:
+#         battery_2_index += 1
+      
+
+#     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+
+# # successful_combinations_store = [battery_1_index(1), battery_1_series(2), battery_1_parallel(3),
+#                                 # battery_2_index(4), battery_2_series(5), battery_2_parallel(6),
+#                                 # capacity(7), discharging_power(8), mass(9), charging_power(10)]
+
+# end_time = time.time()  # End timer
+
+# elapsed_time = end_time - start_time
+# print(f"Elapsed time: {elapsed_time:.6f} seconds")
+        
+# print(count_successful_combinations)
+
+# if successful_combinations:
+#     max_capacity_row = max(successful_combinations, key=lambda x: x[7])
+#     print(max_capacity_row)
+
+
+#############################################################
+
+# Checks using battery mass not pack mass
+
 multi_bat_success = 0
 count_successful_combinations = 0
 successful_combinations = []
@@ -73,7 +133,7 @@ while multi_bat_success == 0:
 
     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
     multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
-    Two_Chem_Efficient(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 135000, 511000, 459, 289, 540, 200000)
+    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 75000, 250000, 459, 289, 320, 160000)
 
     if multi_bat_success == 1:
         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
@@ -86,10 +146,13 @@ while multi_bat_success == 0:
         multi_bat_success = 0
         count_successful_combinations += 1
 
-    if battery_1_index == 379:
+    if battery_2_index == 379 and battery_1_index == 378:
         break
-    else:
+    elif battery_2_index == 379:
         battery_1_index += 1
+        battery_2_index = battery_1_index + 1
+    else:
+        battery_2_index += 1
       
 
     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
@@ -109,48 +172,48 @@ if successful_combinations:
     max_capacity_row = max(successful_combinations, key=lambda x: x[7])
     print(max_capacity_row)
 
+#############################################################
 
 
-single_bat_success = 0
-count_successful_batteries = 0
-successful_batteries = []
+# single_bat_success = 0
+# count_successful_batteries = 0
+# successful_batteries = []
 
 
-while single_bat_success == 0:
+# while single_bat_success == 0:
 
-    # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
-    multi_bat_success, battery_1_series, battery_1_parallel, capacity, discharging_power, mass, charging_power = \
-    One_Chem_Comparison(battery_data[f"battery_{battery_1_index}_index"], 75000, 300000, 459, 289, 540, 200000)
-    # battery_1, req_capacity, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req
+#     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+#     multi_bat_success, battery_1_series, battery_1_parallel, capacity, discharging_power, mass, charging_power = \
+#     One_Chem_Comparison(battery_data[f"battery_{battery_1_index}_index"], 75000, 300000, 459, 289, 1100, 200000)
+#     # battery_1, req_capacity, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req
 
-    if single_bat_success == 1:
-        # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+#     if single_bat_success == 1:
+#         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
         
-        successful_batteries.append([
-            battery_1_index, battery_1_series, battery_1_parallel, 
-            battery_2_index, battery_2_series, battery_2_parallel, 
-            capacity, discharging_power, mass, charging_power
-        ])
-        single_bat_success = 0
-        count_successful_batteries += 1
+#         successful_batteries.append([
+#             battery_1_index, battery_1_series, battery_1_parallel,
+#             capacity, discharging_power, mass, charging_power])
+        
+#         single_bat_success = 0
+#         count_successful_batteries += 1
 
-    if battery_1_index == 50:
-        break
-    else:
-        battery_1_index += 1
+#     if battery_1_index == 379:
+#         break
+#     else:
+#         battery_1_index += 1
     
 
-    # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+#     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
     
-print(count_successful_batteries)
+# print(count_successful_batteries)
 
-if successful_batteries:
-    max_capacity_row_single_bat = max(successful_batteries, key=lambda x: x[7])
-    print(max_capacity_row_single_bat)
-
-
+# if successful_batteries:
+#     max_capacity_row_single_bat = max(successful_batteries, key=lambda x: x[7])
+#     print(max_capacity_row_single_bat)
 
 
+
+#############################################################
 
 
 
