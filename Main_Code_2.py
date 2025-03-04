@@ -129,11 +129,19 @@ successful_combinations = []
 
 start_time = time.time()
 
+req_capacity = 75000
+req_discharging_power = 250000
+req_max_V = 459
+req_min_V = 275
+req_max_mass = 400
+req_charging_power = 160000
+
 while multi_bat_success == 0:
 
     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
     multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
-    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 75000, 250000, 459, 289, 320, 160000)
+    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"],\
+                                             req_capacity, req_discharging_power, req_max_V, req_min_V, req_max_mass, req_charging_power)
 
     if multi_bat_success == 1:
         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
@@ -146,7 +154,7 @@ while multi_bat_success == 0:
         multi_bat_success = 0
         count_successful_combinations += 1
 
-    if battery_2_index == 379 and battery_1_index == 378:
+    if battery_1_index == 378 and battery_2_index == 379:
         break
     elif battery_2_index == 379:
         battery_1_index += 1

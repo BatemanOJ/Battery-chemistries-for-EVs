@@ -6,10 +6,12 @@ import time
 from Test_Two_Chem_Efficient_Battery_Mass_Not_Pack import Two_Chem_Efficient_Battery_Mass_Not_Pack
 from Two_Chemistries import Two_Chemistries
 from Two_Chem_Efficient import Two_Chem_Efficient
+from Check_battery_index_order import Check_Battery_Order
 
 
-battery_1_index = 174
-battery_2_index = 223
+
+battery_1_index = 1
+battery_2_index = 2
 
 # for i in range(1, 388):
 #     battery_{i}_index = Get_Battery_Data_Row(i)
@@ -37,22 +39,49 @@ start_time = time.time()
 
 while multi_bat_success == 0:
 
-    # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+    Check_battery_1_order = battery_data[f"battery_{battery_1_index}_index"][1] 
+
+    print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
     multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
-    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], 75000, 250000, 459, 289, 320, 160000)
+    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"], \
+                                             75000, 250000, 459, 250, 500, 160000)
 
     if multi_bat_success == 1:
         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
         
+        # Check the battery indexes are the right way round
+        check_battery_order = Check_Battery_Order (battery_data, battery_1_index, battery_2_index, battery_1_series, battery_1_parallel, \
+                                                   battery_2_series, battery_2_parallel, capacity)
+        
+        print(f"Check Battery Order: {check_battery_order}")
+
+        # successful_combinations.append([
+        #     battery_1_index, battery_1_series, battery_1_parallel, 
+        #     battery_2_index, battery_2_series, battery_2_parallel, 
+        #     capacity, discharging_power, mass, charging_power
+        # ])
+
+        # print(successful_combinations)
+
+        if check_battery_order == 0:
+            battery_hold_index = battery_1_index
+            battery_1_index_switched = battery_2_index
+            battery_2_index_switched = battery_hold_index
+        elif check_battery_order == 1:
+            battery_1_index_switched = battery_1_index
+            battery_2_index_switched = battery_2_index
+
         successful_combinations.append([
-            battery_1_index, battery_1_series, battery_1_parallel, 
-            battery_2_index, battery_2_series, battery_2_parallel, 
+            battery_1_index_switched, battery_1_series, battery_1_parallel, 
+            battery_2_index_switched, battery_2_series, battery_2_parallel, 
             capacity, discharging_power, mass, charging_power
         ])
         multi_bat_success = 0
         count_successful_combinations += 1
 
-    if battery_1_index == 1 and battery_2_index == 379:
+        print(successful_combinations)
+
+    if battery_1_index == 1 and battery_2_index == 24:
         break
     elif battery_2_index == 379:
         battery_1_index += 1

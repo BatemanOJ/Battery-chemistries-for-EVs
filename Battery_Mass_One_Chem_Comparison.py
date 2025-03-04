@@ -9,7 +9,7 @@ from Calculate_Pack_Mass import Calculate_Mass_One_Batteries
 
 
 
-def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_pack_mass, peak_charge_power_req):
+def Battery_Mass_One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_pack_mass, peak_charge_power_req):
 
     # Battery 1 is the energy dense one and battery 2 is the power dense one
     # battery_1, battery_2, battery_1_Wh, battery_2_Wh = Find_Power_Dense_Battery_Efficient(battery_1, battery_2)
@@ -27,7 +27,23 @@ def One_Chem_Comparison(battery_1, req_capacity, peak_power_req, max_pack_V_allo
 
     # print(f"Pre-tests, Capacity: {capacity} Batteries: {no_battery_1}, Mass: {pack_mass}")
 
-    
+    if mass > max_mass:
+        while mass > max_mass:
+            if no_battery_1 > 1 and no_battery_1 >= no_battery_2:
+                no_battery_1 -= 1
+
+            elif no_battery_2 > 1 and no_battery_2 > no_battery_1:
+                no_battery_2 -= 1
+
+            else:
+                success = 0
+                # print(f"Fail. Mass over limit: {mass}")
+                return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0
+            
+            mass = no_battery_1 * (battery_1[21]/1000) + no_battery_2 * (battery_2[21]/1000)
+            # print(f"Mass reducer, Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+
+
     while req_capacity > capacity and pack_mass <= max_pack_mass:
 
         if req_capacity - (no_battery_1 * battery_1_Wh) > 100 * battery_1_Wh:
