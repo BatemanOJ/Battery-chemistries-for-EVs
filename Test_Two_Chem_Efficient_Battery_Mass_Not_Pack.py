@@ -83,6 +83,9 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
     # check_max_V = 0
     
     dont_reduce_series = 1
+    check_reduce_series = 0
+    counter_check_reduces_series = 0
+    counter_check_reduces_series_fail = 0
 
     no_battery_1_parallel = 1
     no_battery_2_parallel = 1
@@ -97,11 +100,12 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
     print(f"First capacity check{check_capacity, capacity}")
     while check_max_V == 0:# and check_mass == 1 and check_min_V == 1 and check_capacity == 1:
 
-        check_reduce_series = 0
+        
 
         if check_capacity == 1 and check_max_V == 0 and check_min_V == 1 and check_mass == 1 and dont_reduce_series == 1:
             stored_no_battery_1_series = no_battery_1_series
             stored_no_battery_2_series = no_battery_2_series
+            counter_check_reduces_series += 1
             while check_capacity == 1 and check_max_V == 0 and check_min_V == 1 and check_mass == 1:
                 if battery_1[15] > battery_2[15] and battery_1_Wh < battery_2_Wh:
                     no_battery_1_series -= 1
@@ -130,8 +134,10 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
                 no_battery_1_series = stored_no_battery_1_series
                 no_battery_2_series = stored_no_battery_2_series
                 dont_reduce_series = 0
+                counter_check_reduces_series_fail += 1
                 print(f"dont_reduce_series: {dont_reduce_series}")
 
+        print(f"{counter_check_reduces_series} Fail: {counter_check_reduces_series_fail}")
 
         if no_battery_2_series < no_battery_1_series:
             no_battery_1_series = no_battery_1_series - math.floor(no_battery_1_series/(1+no_battery_1_parallel))

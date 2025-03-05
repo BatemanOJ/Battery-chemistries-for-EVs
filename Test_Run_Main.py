@@ -81,7 +81,7 @@ while multi_bat_success == 0:
 
         print(successful_combinations)
 
-    if battery_1_index == 1 and battery_2_index == 24:
+    if battery_1_index == 1 and battery_2_index == 379:
         break
     elif battery_2_index == 379:
         battery_1_index += 1
