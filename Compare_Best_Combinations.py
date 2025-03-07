@@ -14,8 +14,8 @@ def Compare_Best_Combination(successful_combinations):
     average_discharging_power = sum(x[7] for x in successful_combinations)/len(successful_combinations)
     average_charging_power = sum(x[9] for x in successful_combinations)/len(successful_combinations)
 
-    list_weighted_total = []
-    list_total = []
+    # list_weighted_total = []
+    # list_total = []
     list_weighted_total_normalised = []
 
     ranges = []
@@ -34,17 +34,17 @@ def Compare_Best_Combination(successful_combinations):
         discharging_powers.append(discharging_power_difference)
         masses.append(mass_difference)
 
-        total = range_difference + charging_power_difference + discharging_power_difference + mass_difference
-        list_total.append([i, total])
+        # total = range_difference + charging_power_difference + discharging_power_difference + mass_difference
+        # list_total.append([i, total])
 
-        weighted_range_difference = range_difference * 5
-        weighted_charging_power_difference = charging_power_difference * 1.5
-        weighted_discharging_power_difference = discharging_power_difference * 1.5
-        weighted_mass_difference = mass_difference
+        # weighted_range_difference = range_difference * 5
+        # weighted_charging_power_difference = charging_power_difference * 1.5
+        # weighted_discharging_power_difference = discharging_power_difference * 1.5
+        # weighted_mass_difference = mass_difference
 
-        weighted_total = weighted_range_difference + weighted_charging_power_difference + weighted_discharging_power_difference + weighted_mass_difference
+        # weighted_total = weighted_range_difference + weighted_charging_power_difference + weighted_discharging_power_difference + weighted_mass_difference
 
-        list_weighted_total.append([i, weighted_total])
+        # list_weighted_total.append([i, weighted_total])
 
     normalise_ranges = normalise(ranges)
     normalise_charging_powers = normalise(charging_powers)
@@ -65,25 +65,25 @@ def Compare_Best_Combination(successful_combinations):
             norm_mass_difference * 1
         )
 
-        list_weighted_total_normalised.append([i, weighted_total])
+        list_weighted_total_normalised.append([i, weighted_total_normalised])
 
         
     
-    max_total = max(list_total, key=lambda x: x[1])
-    print(f"Max Total: {max_total}")
-    print(f"Max Total combination: {successful_combinations[max_total[0]]}")
+    # max_total = max(list_total, key=lambda x: x[1])
+    # print(f"Max Total: {max_total}")
+    # print(f"Max Total combination: {successful_combinations[max_total[0]]}")
     
-    max_weighted_total = max(list_weighted_total, key=lambda x: x[1])
-    print(f"Max Weighted Total: {max_weighted_total}")
-    print(f"Max Weighted Total combination: {successful_combinations[max_weighted_total[0]]}")
+    # max_weighted_total = max(list_weighted_total, key=lambda x: x[1])
+    # print(f"Max Weighted Total: {max_weighted_total}")
+    # print(f"Max Weighted Total combination: {successful_combinations[max_weighted_total[0]]}")
 
     max_weighted_total_normalised = max(list_weighted_total_normalised, key=lambda x: x[1])
-    print(f"Max Weighted Total: {max_weighted_total_normalised}")
+    # print(f"Max Weighted Total: {max_weighted_total_normalised}")
     print(f"Max Weighted Normalised Total combination: {successful_combinations[max_weighted_total_normalised[0]]}")
 
     # print(f"Range Difference: {range_difference}, Charging Power Difference: {charging_power_difference}, Discharging Power Difference: {discharging_power_difference}, Mass Difference: {mass_difference}")
     print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
-        
+    Averages = [average_discharging_power, average_mass, average_charging_power, average_range]
         
 
     
@@ -118,13 +118,26 @@ def Compare_Best_Combination(successful_combinations):
     # if better_than_average_combo:
     #     print(len(better_than_average_combo))
 
-    print(f"Counter: {perfect_counter}, 3/4 mass: {Three_out_of_4_counter_mass}, 3/4: {Three_out_of_4_counter}, 2/4: {Two_out_of_4_counter}")
+    # print(f"Counter: {perfect_counter}, 3/4 mass: {Three_out_of_4_counter_mass}, 3/4: {Three_out_of_4_counter}, 2/4: {Two_out_of_4_counter}")
 
-    for i in range(0, len(Three_out_of_4_mass_list)):
-        print(f"{Three_out_of_4_mass_list[i]}")
+    if Three_out_of_4_counter_mass != 0:
+        # for i in range(len(Three_out_of_4_mass_list)):
+        #     print(f"{Three_out_of_4_mass_list[i]}")
 
-    max_range_row = max(Three_out_of_4_mass_list, key=lambda x: x[10])
+        max_range_row_3_of_4 = max(Three_out_of_4_mass_list, key=lambda x: x[10])
+        print(f"Max Range 3/4: {max_range_row_3_of_4}")
+
+    max_discharging_row = max(successful_combinations, key=lambda x: x[7])
+    max_charging_row = max(successful_combinations, key=lambda x: x[9])
+    max_range_row = max(successful_combinations, key=lambda x: x[10])
     print(f"Max Range: {max_range_row}")
-    print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
 
-    return range_difference 
+    # print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
+
+    # Best if you car about all factors equally:    successful_combinations[max_weighted_total_normalised[0]]
+    # Best for range only:                          max_range_row
+    # Best for discharging only:                    max_discharging_row
+    # Best for charging only:                       max_charging_row
+    # Best if you don't care about mass:            max_range_row_3_of_4
+    
+    return successful_combinations[max_weighted_total_normalised[0]], max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages
