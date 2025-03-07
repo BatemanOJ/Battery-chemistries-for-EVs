@@ -12,7 +12,7 @@ from Check_Constraints import Check_Mass_Battery_Only, Check_Max_V, Check_Min_V,
 
 
 
-def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req):
+def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req, tests, fails):
 
     # Battery 1 is the energy dense one and battery 2 is the power dense one
     battery_1, battery_2, battery_1_Wh, battery_2_Wh = Find_Power_Dense_Battery_Efficient(battery_1, battery_2)
@@ -38,7 +38,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
             else:
                 success = 0
                 print(f"Fail. Mass over limit: {mass}")
-                return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0
+                return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0, 0, 0
             
             mass = no_battery_1 * (battery_1[21]/1000) + no_battery_2 * (battery_2[21]/1000)
             print(f"Mass reducer, Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
@@ -71,7 +71,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
         if mass > max_mass:
             print(f"Maximum mass exceeded: {mass}, Maximum: {max_mass}")
             success = 0
-            return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0
+            return success, no_battery_1, 0, no_battery_2, 0, capacity, 0, mass, 0, 0, 0
         # else:
             
     print(f"Capacity: {capacity} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
@@ -164,7 +164,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
             else: 
                 success = 0
                 print(f"Fail. Mass, voltage or capacity over limit{mass, max_pack_V, min_pack_V, capacity}, Check Cap: {check_capacity}")
-                return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+                return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0, 0, 0
             
             check_mass, mass = Check_Mass_Battery_Only(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
             
@@ -178,7 +178,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
         if check_min_V == 0 or check_capacity == 0 or check_mass == 0:
             print(f"Fail. Mass, voltage or capacity over limit{mass, max_pack_V, min_pack_V, capacity}, Check Cap: {check_capacity}")
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0, 0, 0
     
     print(f"Voltage Check Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}")
 
@@ -223,7 +223,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0 or check_capacity == 0:
             print(f"Fail. Mass, voltage or capacity over limit{mass, max_pack_V, min_pack_V, capacity}, Check Cap: {check_capacity}")
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0, 0, 0
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
@@ -261,8 +261,8 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
                            no_battery_2_series * no_battery_2_parallel * battery_2_peak_charge_power 
         # mass = no_battery_1 * (battery_1[21]/1000) + no_battery_2 * (battery_2[21]/1000)
 
-        print(f"Mass: {max_mass, mass}, max-V: {max_pack_V_allowed, max_pack_V}, min-V: {min_pack_V_allowed, min_pack_V}, capacity: {capacity}, Check Cap: {check_capacity}, \
-              Peak Power: {peak_power_req, peak_power_generated} Peak Charge Power: {peak_charge_power_req, peak_charge_power_generated}")
+        # print(f"Mass: {max_mass, mass}, max-V: {max_pack_V_allowed, max_pack_V}, min-V: {min_pack_V_allowed, min_pack_V}, capacity: {capacity}, Check Cap: {check_capacity}, \
+        #       Peak Power: {peak_power_req, peak_power_generated} Peak Charge Power: {peak_charge_power_req, peak_charge_power_generated}")
 
         check_mass, mass = Check_Mass_Battery_Only(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
@@ -272,7 +272,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
         if check_mass == 0 or check_max_V == 0 or check_min_V == 0 or check_capacity == 0:
             print(f"Fail. Mass: {mass}, max-V: {max_pack_V}, min-V: {min_pack_V}, capacity: {capacity}, Check Cap: {check_capacity}")            
             success = 0
-            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+            return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0, 0, 0
 
         
 
@@ -286,9 +286,64 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
     if check_mass == 0 or check_max_V == 0 or check_min_V == 0 or check_capacity == 0:
         print(f"Fail. Mass: {mass}, max-V: {max_pack_V}, min-V: {min_pack_V}, capacity: {capacity}, Check Cap: {check_capacity}")            
         success = 0
-        return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
+        return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0, 0, 0
     
     print(f"Charging Power 3{peak_charge_power_req, peak_charge_power_generated}")
+
+    
+    # Function to check if another battery can be added
+    def can_add_battery():
+        check_mass, _ = Check_Mass_Battery_Only(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
+        check_max_V, _ = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
+        check_min_V, _ = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
+        check_capacity, _ = Check_Capacity(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_cap)
+
+        print(f"Checks: {check_mass, check_max_V, check_min_V, check_capacity}")
+
+        return check_mass and check_max_V and check_min_V and check_capacity  # Returns True if all checks pass
+
+    # **Add Batteries to Series**
+    while True:
+        no_battery_1_series += 1
+        print(f"1 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        tests += 1
+        if not can_add_battery():
+            no_battery_1_series -= 1
+            print(f"1 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    while True:
+        no_battery_2_series += 1
+        print(f"2 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        tests += 1
+        if not can_add_battery():
+            no_battery_2_series -= 1
+            print(f"2 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    # **Add Batteries to Parallel**
+    while True:
+        no_battery_1_parallel += 1
+        print(f"1 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        tests += 1
+        if not can_add_battery():
+            no_battery_1_parallel -= 1
+            print(f"1 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    while True:
+        no_battery_2_parallel += 1
+        print(f"2 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        tests += 1
+        if not can_add_battery():
+            no_battery_2_parallel -= 1
+            print(f"2 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            fails += 1
+            break  # Stop adding when constraint is exceeded
+
     success = 1
 
-    return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated
+    return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated, tests, fails

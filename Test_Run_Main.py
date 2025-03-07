@@ -10,8 +10,8 @@ from Check_battery_index_order import Check_Battery_Order
 
 
 
-battery_1_index = 166
-battery_2_index = 177
+battery_1_index = 1
+battery_2_index = 2
 
 # for i in range(1, 388):
 #     battery_{i}_index = Get_Battery_Data_Row(i)
@@ -44,6 +44,11 @@ req_min_V = 240
 req_max_mass_battery = 200
 req_charging_power = 75000
 
+tests = 0
+fails = 0
+tests_out = 0
+fails_out = 0
+
 while multi_bat_success == 0:
 
     Check_battery_1_order = battery_data[f"battery_{battery_1_index}_index"][1] 
@@ -51,9 +56,12 @@ while multi_bat_success == 0:
     print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
 
     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
-    multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
+    multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power, tests, fails = \
     Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"],\
-                                             req_capacity, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power)
+                                             req_capacity, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power, tests, fails)
+    
+    tests_out += tests
+    fails_out += fails
 
     if multi_bat_success == 1:
         # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
@@ -62,7 +70,7 @@ while multi_bat_success == 0:
         check_battery_order = Check_Battery_Order (battery_data, battery_1_index, battery_2_index, battery_1_series, battery_1_parallel, \
                                                    battery_2_series, battery_2_parallel, capacity)
         
-        print(f"Check Battery Order: {check_battery_order}")
+        # print(f"Check Battery Order: {check_battery_order}")
 
         # successful_combinations.append([
         #     battery_1_index, battery_1_series, battery_1_parallel, 
@@ -88,11 +96,11 @@ while multi_bat_success == 0:
         multi_bat_success = 0
         count_successful_combinations += 1
 
-        print(successful_combinations)
+        # print(successful_combinations)
 
-    if battery_1_index == 166 and battery_2_index == 177:
+    if battery_1_index == 1 and battery_2_index == 378:
         break
-    elif battery_2_index == 379:
+    elif battery_2_index == 378:
         battery_1_index += 1
         battery_2_index = battery_1_index + 1
     else:
@@ -115,5 +123,7 @@ print(count_successful_combinations)
 if successful_combinations:
     max_capacity_row = max(successful_combinations, key=lambda x: x[7])
     print(max_capacity_row)
+
+print(f"Tests: {tests_out}, Fails: {fails_out}")
 
 #############################################################

@@ -280,6 +280,69 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_cap, peak
         return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, 0, mass, 0
     
     # print(f"Charging Power 3{peak_charge_power_req, peak_charge_power_generated}")
+
+    # Function to check if another battery can be added
+    def can_add_battery():
+        check_mass, _ = Check_Mass_Battery_Only(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
+        check_max_V, _ = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
+        check_min_V, _ = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
+        check_capacity, _ = Check_Capacity(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_cap)
+
+        # print(f"Checks: {check_mass, check_max_V, check_min_V, check_capacity}")
+
+        return check_mass and check_max_V and check_min_V and check_capacity  # Returns True if all checks pass
+    
+
+    # **Add Batteries to Series**
+    while True:
+        no_battery_1_series += 1
+        # print(f"1 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        # tests += 1
+        if not can_add_battery():
+            no_battery_1_series -= 1
+            # print(f"1 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            # fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    while True:
+        no_battery_2_series += 1
+        # print(f"2 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        # tests += 1
+        if not can_add_battery():
+            no_battery_2_series -= 1
+            # print(f"2 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            # fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    # **Add Batteries to Parallel**
+    while True:
+        no_battery_1_parallel += 1
+        # print(f"1 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        # tests += 1
+        if not can_add_battery():
+            no_battery_1_parallel -= 1
+            # print(f"1 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            # fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    while True:
+        no_battery_2_parallel += 1
+        # print(f"2 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+        # tests += 1
+        if not can_add_battery():
+            no_battery_2_parallel -= 1
+            # print(f"2 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
+            # fails += 1
+            break  # Stop adding when constraint is exceeded
+
+    check_mass, mass = Check_Mass_Battery_Only(battery_1[21], battery_2[21], no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
+    check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
+    check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
+    check_capacity, capacity = Check_Capacity(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_cap)
+
+
+        
     success = 1
+    # print(success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated)
 
     return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, capacity, peak_power_generated, mass, peak_charge_power_generated
