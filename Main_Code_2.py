@@ -15,6 +15,7 @@ from Two_Chem_Efficient_Battery_Mass_Not_Pack import Two_Chem_Efficient_Battery_
 from One_Chem_Comparison import One_Chem_Comparison
 from Range_Estimation import Range_Estimation_for_Batteries
 from Check_battery_index_order import Check_Battery_Order
+from Compare_Best_Combinations import Compare_Best_Combination
 
 
 
@@ -143,12 +144,23 @@ successful_combinations = []
 
 start_time = time.time()
 
-req_capacity = 135000
-req_discharging_power = 511000
-req_max_V = 550
-req_min_V = 210
-req_max_mass_battery = 540
-req_charging_power = 210000
+# # Rivian R1T
+# req_capacity = 135000
+# req_discharging_power = 511000
+# req_max_V = 550
+# req_min_V = 210
+# req_max_mass_battery = 540
+# req_charging_power = 210000
+
+# Nissan Leaf
+req_capacity = 27700
+req_discharging_power = 90000
+req_max_V = 398
+req_min_V = 240
+req_max_mass_battery = 185.5
+req_charging_power = 50000
+
+
 
 while multi_bat_success == 0:
 
@@ -207,9 +219,9 @@ if successful_combinations:
     print(min_mass_row)
     print(max_capacity_row)
 
-car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
+# car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
 # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
-# car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)/135, Calculated: 179 Using 2 chems: 310
+car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)/135, Calculated: 179 Using 2 chems: 310
 # car_data = [1830, 0.23, 2.268, 0.015, 0] # Tesla model 3      Actual: 576, Calculated: 572
 # car_data = [2584, 0.29, 2.3, 0.015, 0] # Polestar 3              Actual: 482, Calculated: 532
 
@@ -238,7 +250,7 @@ if successful_combinations:
         battery_1 = battery_data[f"battery_{successful_combinations[i][0]}_index"]
         battery_2 = battery_data[f"battery_{successful_combinations[i][3]}_index"]
 
-        print(f"Battery number series parallel {successful_combinations[i][0], successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][3], successful_combinations[i][4], successful_combinations[i][5]}")
+        # print(f"Battery number series parallel {successful_combinations[i][0], successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][3], successful_combinations[i][4], successful_combinations[i][5]}")
 
         Range = Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
 
@@ -252,10 +264,12 @@ if successful_combinations:
     max_capacity_row = max(successful_combinations, key=lambda x: x[7])
     min_mass_row = min(successful_combinations, key=lambda x: x[9])
 
-    print(f"Min mass: {min_mass_row}")
-    print(f"Max capacity: {max_capacity_row}")
-    print(f"Max range: {max_range_row}")
-    print(f"Min range: {min_range_row}")
+    # print(f"Min mass: {min_mass_row}")
+    # print(f"Max capacity: {max_capacity_row}")
+    # print(f"Max range: {max_range_row}")
+    # print(f"Min range: {min_range_row}")
+
+better_than_average_combos = Compare_Best_Combination(successful_combinations)
 
 #############################################################
 
