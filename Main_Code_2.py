@@ -107,9 +107,9 @@ print("WLTP Data Imported")
 #         multi_bat_success = 0
 #         count_successful_combinations += 1
 
-#     if battery_2_index == 379 and battery_1_index == 378:
+#     if battery_2_index == 378 and battery_1_index == 377:
 #         break
-#     elif battery_2_index == 379:
+#     elif battery_2_index == 378:
 #         battery_1_index += 1
 #         battery_2_index = battery_1_index + 1
 #     else:
@@ -191,9 +191,9 @@ while multi_bat_success == 0:
         multi_bat_success = 0
         count_successful_combinations += 1
 
-    if battery_1_index == 378 and battery_2_index == 379:
+    if battery_1_index == 377 and battery_2_index == 378:
         break
-    elif battery_2_index == 379:
+    elif battery_2_index == 378:
         battery_1_index += 1
         battery_2_index = battery_1_index + 1
     else:
