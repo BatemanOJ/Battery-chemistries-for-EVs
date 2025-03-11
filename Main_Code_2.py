@@ -18,6 +18,8 @@ from Check_battery_index_order import Check_Battery_Order
 from Compare_Best_Combinations import Compare_Best_Combination
 from Calculate_Charging_Time import Charging_times
 
+from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery_Options
+
 
 
 # Load the Excel file
@@ -139,10 +141,6 @@ print("WLTP Data Imported")
 
 # Checks using battery mass not pack mass
 
-multi_bat_success = 0
-count_successful_combinations = 0
-successful_combinations = []
-
 start_time = time.time()
 
 # # Rivian R1T
@@ -154,71 +152,40 @@ start_time = time.time()
 # req_charging_power = 210000
 
 # Nissan Leaf
-req_capacity = 27700
+req_energy = 27700
 req_discharging_power = 90000
 req_max_V = 398
 req_min_V = 240
 req_max_mass_battery = 185.5
+req_max_mass_pack = 315
 req_charging_power = 50000
 
+successful_combinations, count_successful_combinations = Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
+                                                                                  req_min_V, req_max_mass_pack, req_charging_power)
+
+successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
+                                                                                  req_min_V, req_max_mass_pack, req_charging_power)
 
 
-while multi_bat_success == 0:
+# for i in range(len(successful_combinations_1_bat)):
+#     successful_combinations.append(successful_combinations_1_bat[i])
 
-    # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
-    multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, capacity, discharging_power, mass, charging_power = \
-    Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"],\
-                                             req_capacity, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power)
-
-    if multi_bat_success == 1:
-        
-        # Check the battery indexes are the right way round
-        check_battery_order = Check_Battery_Order (battery_data, battery_1_index, battery_2_index, battery_1_series, battery_1_parallel, \
-                                                   battery_2_series, battery_2_parallel, capacity)
-
-        if check_battery_order == 0:
-            battery_hold_index = battery_1_index
-            battery_1_index_switched = battery_2_index
-            battery_2_index_switched = battery_hold_index
-        elif check_battery_order == 1:
-            battery_1_index_switched = battery_1_index
-            battery_2_index_switched = battery_2_index
-
-        successful_combinations.append([
-            battery_1_index_switched, battery_1_series, battery_1_parallel, 
-            battery_2_index_switched, battery_2_series, battery_2_parallel, 
-            capacity, discharging_power, mass, charging_power
-        ])
-        multi_bat_success = 0
-        count_successful_combinations += 1
-
-    if battery_1_index == 332 and battery_2_index == 333:
-        break
-    elif battery_2_index == 333:
-        battery_1_index += 1
-        battery_2_index = battery_1_index + 1
-    else:
-        battery_2_index += 1
-      
-
-    # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
-
-# successful_combinations_store = [battery_1_index(1), battery_1_series(2), battery_1_parallel(3),
-                                # battery_2_index(4), battery_2_series(5), battery_2_parallel(6),
-                                # capacity(7), discharging_power(8), mass(9), charging_power(10), range(11)]
+# successful_combinations_store = [battery_1_index(0), battery_1_series(1), battery_1_parallel(2),
+                                # battery_2_index(3), battery_2_series(4), battery_2_parallel(5),
+                                # capacity(6), discharging_power(7), mass(8), charging_power(9), range(10)]
 
 end_time = time.time()  # End timer
 
 elapsed_time = end_time - start_time
 print(f"Elapsed time: {elapsed_time:.6f} seconds")
         
-print(count_successful_combinations)
+print(f"2-Batteries count: {count_successful_combinations}, 1-Battery count: {count_successful_combinations_1_bat}")
 
 if successful_combinations:
-    max_capacity_row = max(successful_combinations, key=lambda x: x[7])
-    min_mass_row = min(successful_combinations, key=lambda x: x[9])
-    print(min_mass_row)
-    print(max_capacity_row)
+    max_energy_row = max(successful_combinations, key=lambda x: x[6])
+    min_mass_row = min(successful_combinations, key=lambda x: x[8])
+    print(f"Min mass: {min_mass_row}")
+    print(f"Max energy: {max_energy_row}")
 
 # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
 # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
@@ -261,7 +228,7 @@ if successful_combinations:
         battery_1 = battery_data[f"battery_{successful_combinations[i][0]}_index"]
         battery_2 = battery_data[f"battery_{successful_combinations[i][3]}_index"]
         
-        battery_1_min_time, battery_2_min_time, battery_1_std_time, battery_2_std_time = Charging_times(battery_data_series_parallel, battery_1, battery_2, successful_combinations)
+        min_total_time, std_total_time, max_total_power = Charging_times(battery_data_series_parallel, battery_1, battery_2, successful_combinations)
 
 #############################################################
 
@@ -270,12 +237,28 @@ if successful_combinations:
 # count_successful_batteries = 0
 # successful_batteries = []
 
+# # # # Rivian R1T
+# # # req_capacity = 135000
+# # # req_discharging_power = 511000
+# # # req_max_V = 550
+# # # req_min_V = 210
+# # # req_max_mass_battery = 540
+# # # req_charging_power = 210000
+
+# # Nissan Leaf
+# req_energy = 27700
+# req_discharging_power = 90000
+# req_max_V = 398
+# req_min_V = 240
+# req_max_mass_battery = 315
+# req_charging_power = 50000
+
 
 # while single_bat_success == 0:
 
 #     # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
 #     multi_bat_success, battery_1_series, battery_1_parallel, capacity, discharging_power, mass, charging_power = \
-#     One_Chem_Comparison(battery_data[f"battery_{battery_1_index}_index"], 75000, 300000, 459, 289, 1100, 200000)
+#     One_Chem_Comparison(battery_data[f"battery_{battery_1_index}_index"], req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power)
 #     # battery_1, req_capacity, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req
 
 #     if single_bat_success == 1:
@@ -288,7 +271,7 @@ if successful_combinations:
 #         single_bat_success = 0
 #         count_successful_batteries += 1
 
-#     if battery_1_index == 379:
+#     if battery_1_index == 333:
 #         break
 #     else:
 #         battery_1_index += 1

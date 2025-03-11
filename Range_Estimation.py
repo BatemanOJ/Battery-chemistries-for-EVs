@@ -38,6 +38,8 @@ def Range_Estimation_for_EVs(battery_cap, EV_number):
     
     return range_est_50kph, range_est_100kph
 
+
+
 def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2):
 
     # battery_data = [no_series_1, no_series_2, no_parallel_1, no_parallel_2]
@@ -58,14 +60,27 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
     Power_values = []
     Time_values = []
 
-    Battery_mass = battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000) + \
-                   battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000)
+    if battery_data_series_parallel[2] == 0:
+        Battery_mass = battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000)
+        
+        Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100
+        
+        battery_capacity = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16])/1000
     
+    else:
+    
+        Battery_mass = battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000) + \
+                    battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000)
+        
+        Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100 + \
+                    ((battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000))/battery_2[40])*100
+        
+        battery_capacity = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16] + \
+                        battery_data_series_parallel[2] * battery_data_series_parallel[3] * battery_2[14] * battery_2[16])/1000
+    
+
     # print(f"battery mass: {battery_1[21]}, {battery_2[21]}")
     # print(f"Series - parallel {battery_data_series_parallel[0], battery_data_series_parallel[1], battery_data_series_parallel[2], battery_data_series_parallel[3]}")
-    
-    Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100 + \
-                ((battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000))/battery_2[40])*100
     
     # Pack_mass_test = 795.92 # Rivian R1T
     # Pack_mass_test = 443 # Kia Niro
@@ -78,26 +93,18 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
 
     for i in range(1, len(WLTP_data)):
         WLTP_row_index = i # 1 = row 3
-        # if i == 2:
         #     print(f"Row 1 acc: {WLTP_data[f"WLTP_{0}_index"][4], WLTP_data[f"WLTP_{1}_index"][4], WLTP_data[f"WLTP_{2}_index"][4]}")
         
-        # Power = (EV_mass + Pack_mass_test) * WLTP_data[f"WLTP_{WLTP_row_index}_index"][4] + (p) * Cd * Af * (WLTP_data[f"WLTP_{WLTP_row_index}_index"][3]**2) + \
-        #         Rr * (EV_mass + Pack_mass_test) * 9.81 + (EV_mass + Pack_mass_test) * 9.81 * math.sin(Angle_of_Car)
         
         Power = (EV_mass + Pack_mass) * WLTP_data[f"WLTP_{WLTP_row_index}_index"][4] + (p) * Cd * Af * (WLTP_data[f"WLTP_{WLTP_row_index}_index"][3]**2) + \
                 Rr * (EV_mass + Pack_mass) * 9.81 + (EV_mass + Pack_mass) * 9.81 * math.sin(Angle_of_Car)
         
         
-        time = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]# - WLTP_data[f"WLTP_{WLTP_row_index-1}_index"][1]
-
-        # energy_per_run, error = spi.quad(Power, WLTP_data[f"WLTP_{WLTP_row_index-1}_index"][1], WLTP_data[f"WLTP_{WLTP_row_index}_index"][1])
-
-        # Energy_different_integration.append(energy_per_run)
+        time = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]
 
         Power_values.append(Power)
         Time_values.append(time)
         
-    # Energy_2 = sum(Energy_different_integration)
 
     Energy_1 = np.trapz(Power_values, Time_values)
     # print(f"Power: {Power_values[0:10]}, Time: {Time_values[0:10]}")
@@ -105,12 +112,6 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
 
     Energy_1_per_km = Energy_1/ (23.29023374 * 360000)
     # print(f"Energy 1 per km: {Energy_1_per_km}")
-
-    # Energy_2_per_km = Energy_2/23.290
-    # print(f"Energy 2 per km: {Energy_2_per_km}")
-
-    battery_capacity = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16] + \
-                       battery_data_series_parallel[2] * battery_data_series_parallel[3] * battery_2[14] * battery_2[16])/1000
     
     Range_1 = ((battery_capacity)/Energy_1_per_km) * 0.97
 

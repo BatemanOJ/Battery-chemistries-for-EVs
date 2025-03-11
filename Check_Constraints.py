@@ -20,23 +20,24 @@ def Check_Mass(battery_1, battery_2, series_1, series_2, parallel_1, parallel_2,
 
     return check, pack_mass
 
-def Check_Mass_Battery_Only(battery_1_mass, battery_2_mass, series_1, series_2, parallel_1, parallel_2, max_mass):
+def Check_Mass_Battery_Only(battery_1, battery_2, series_1, series_2, parallel_1, parallel_2, max_mass):
     
-    mass = (series_1 * parallel_1) * (battery_1_mass/1000) + (series_2 * parallel_2) * (battery_2_mass/1000)
+    mass = (series_1 * parallel_1) * (battery_1[21]/1000) + (series_2 * parallel_2) * (battery_2[21]/1000)
+    pack_mass = (((series_1 * parallel_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((series_2 * parallel_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
     # print(mass, max_mass)
 
-    if mass > max_mass:
+    if pack_mass > max_mass:
         check = 0
     else:
         check = 1
 
-    return check, mass
+    return check, pack_mass
 
 def Check_Mass_One_Bat(battery_1, series_1, parallel_1, max_mass):
 
     no_battery_1 = series_1 * parallel_1
     
-    pack_mass = Calculate_Mass_One_Batteries(battery_1, no_battery_1)
+    pack_mass = ((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100
     # print(mass, max_mass)
 
     if pack_mass > max_mass:
@@ -69,15 +70,26 @@ def Check_Min_V(battery_1_min_V, battery_2_min_V, series_1, series_2, min_pack_V
 
     return check, voltage
 
-def Check_Capacity(battery_1_capacity, battery_2_capacity, series_1, series_2, parallel_1, parallel_2, req_capacity):
+def Check_energy(battery_1_energy, battery_2_energy, series_1, series_2, parallel_1, parallel_2, req_energy):
     
-    capacity = (battery_1_capacity * series_1 * parallel_1) + (battery_2_capacity * series_2 * parallel_2)
+    energy = (battery_1_energy * series_1 * parallel_1) + (battery_2_energy * series_2 * parallel_2)
 
-    if capacity < req_capacity:
+    if energy < req_energy:
         check = 0
     else:
         check = 1
 
-    return check, capacity
+    return check, energy
 
-# req_capacity, peak_power_req, min_pack_V_req, max_pack_V_allowed, pack_voltage, 
+def Check_energy_one_battery(battery_1_energy, series_1, parallel_1, req_energy):
+    
+    energy = (battery_1_energy * series_1 * parallel_1)
+
+    if energy < req_energy:
+        check = 0
+    else:
+        check = 1
+
+    return check, energy
+
+# req_energy, peak_power_req, min_pack_V_req, max_pack_V_allowed, pack_voltage, 

@@ -4,6 +4,7 @@
 
 def Meets_Conditions(successful_combination, average_range, average_mass, average_discharging_power, average_charging_power):
     counter = 0
+    fail = 0
     if successful_combination[10] > average_range:
         counter += 1
     else:
