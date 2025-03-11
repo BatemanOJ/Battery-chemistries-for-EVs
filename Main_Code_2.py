@@ -16,6 +16,7 @@ from One_Chem_Comparison import One_Chem_Comparison
 from Range_Estimation import Range_Estimation_for_Batteries
 from Check_battery_index_order import Check_Battery_Order
 from Compare_Best_Combinations import Compare_Best_Combination
+from Calculate_Charging_Time import Charging_times
 
 
 
@@ -60,7 +61,7 @@ battery_data = {}
 battery_database = pd.read_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="RAW DATA")
 
 i = 1
-battery_data = {f"battery_{i}_index": battery_database.iloc[i].tolist() for i in range(388)}  # Adjusted for 388 rows
+battery_data = {f"battery_{i}_index": battery_database.iloc[i].tolist() for i in range(348)}  # Adjusted for 388 rows
 
 print("Battery Data Imported")
 
@@ -191,9 +192,9 @@ while multi_bat_success == 0:
         multi_bat_success = 0
         count_successful_combinations += 1
 
-    if battery_1_index == 377 and battery_2_index == 378:
+    if battery_1_index == 332 and battery_2_index == 333:
         break
-    elif battery_2_index == 378:
+    elif battery_2_index == 333:
         battery_1_index += 1
         battery_2_index = battery_1_index + 1
     else:
@@ -225,25 +226,7 @@ car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 # car_data = [1830, 0.23, 2.268, 0.015, 0] # Tesla model 3      Actual: 576, Calculated: 572
 # car_data = [2584, 0.29, 2.3, 0.015, 0] # Polestar 3              Actual: 482, Calculated: 532
 
-# battery_data_series_parallel_1 = [max_capacity_row[1], max_capacity_row[2], max_capacity_row[4], max_capacity_row[5]]
-# battery_1 = battery_data[f"battery_{max_capacity_row[0]}_index"]
-# battery_2 = battery_data[f"battery_{max_capacity_row[3]}_index"]
 
-# print(f"series/parallel: {battery_data_series_parallel_1}, battery 1: {max_capacity_row[0]}, battery 2: {max_capacity_row[3]}")
-
-
-# Range_1 = Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel_1, battery_1, battery_2)
-
-# battery_data_series_parallel_2 = [min_mass_row[1], min_mass_row[2], min_mass_row[4], min_mass_row[5]]
-# battery_3 = battery_data[f"battery_{min_mass_row[0]}_index"]
-# battery_4 = battery_data[f"battery_{min_mass_row[3]}_index"]
-
-# print(f"series/parallel: {battery_data_series_parallel_2}, battery 1: {min_mass_row[0]}, battery 2: {min_mass_row[3]}")
-
-
-# Range_2 = Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel_2, battery_3, battery_4)
-
-# print(f"Range 1 max capacity: {Range_1} km, Range 2 min mass: {Range_2} km")
 if successful_combinations:
     for i in range(0, len(successful_combinations)):
         battery_data_series_parallel = [successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][4], successful_combinations[i][5]]
@@ -270,6 +253,15 @@ if successful_combinations:
     # print(f"Min range: {min_range_row}")
 
 better_than_average_combos = Compare_Best_Combination(successful_combinations)
+
+if successful_combinations:
+    for i in range(0, len(successful_combinations)):
+
+        battery_data_series_parallel = [successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][4], successful_combinations[i][5]]
+        battery_1 = battery_data[f"battery_{successful_combinations[i][0]}_index"]
+        battery_2 = battery_data[f"battery_{successful_combinations[i][3]}_index"]
+        
+        battery_1_min_time, battery_2_min_time, battery_1_std_time, battery_2_std_time = Charging_times(battery_data_series_parallel, battery_1, battery_2, successful_combinations)
 
 #############################################################
 
