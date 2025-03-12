@@ -142,3 +142,10 @@ def Compare_Best_Combination(successful_combinations):
     # Best if you don't care about mass:            max_range_row_3_of_4
     
     return successful_combinations[max_weighted_total_normalised[0]], max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages
+
+# Returns the row with the highest normalised total, 
+# the row with max range, 
+# the row with max discharging, 
+# the row with max charging, 
+# the maximum range of the ones with above average on 3 out of 4,
+# and Averages of each metric

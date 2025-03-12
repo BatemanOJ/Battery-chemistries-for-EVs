@@ -65,7 +65,7 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
         
         Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100
         
-        battery_capacity = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16])/1000
+        battery_energy = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16])/1000
     
     else:
     
@@ -75,7 +75,7 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
         Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100 + \
                     ((battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000))/battery_2[40])*100
         
-        battery_capacity = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16] + \
+        battery_energy = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16] + \
                         battery_data_series_parallel[2] * battery_data_series_parallel[3] * battery_2[14] * battery_2[16])/1000
     
 
@@ -113,17 +113,17 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
     Energy_1_per_km = Energy_1/ (23.29023374 * 360000)
     # print(f"Energy 1 per km: {Energy_1_per_km}")
     
-    Range_1 = ((battery_capacity)/Energy_1_per_km) * 0.97
+    Range_1 = ((battery_energy)/Energy_1_per_km) * 0.97
 
-    # print(f"Pack mass: {Pack_mass}, Battery mass {Battery_mass}, Battery capacity(kWh): {battery_capacity}, Range: {Range_1}")
+    # print(f"Pack mass: {Pack_mass}, Battery mass {Battery_mass}, Battery capacity(kWh): {battery_energy}, Range: {Range_1}")
 
-    # battery_capacity_test = 135 # Rivian R1T
-    # battery_capacity_test = 64 # Kia Niro
-    # battery_capacity_test = 24 # Nissan Leaf
-    # battery_capacity_test = 82.1 # Tesla model 3
-    # battery_capacity_test = 111 # Polestar 3 
+    # battery_energy_test = 135 # Rivian R1T
+    # battery_energy_test = 64 # Kia Niro
+    # battery_energy_test = 24 # Nissan Leaf
+    # battery_energy_test = 82.1 # Tesla model 3
+    # battery_energy_test = 111 # Polestar 3 
 
-    # Range_1 = ((battery_capacity_test)/Energy_1_per_km) * 0.97
+    # Range_1 = ((battery_energy_test)/Energy_1_per_km) * 0.97
 
     # Power_1 = (EV_mass + Pack_mass_test) * WLTP_data[f"WLTP_{1}_index"][4] 
     # Power_2 = (p/2) * Cd * Af * (WLTP_data[f"WLTP_{1}_index"][3]**2) 
