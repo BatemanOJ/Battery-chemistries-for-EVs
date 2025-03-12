@@ -1,3 +1,4 @@
+
 from Meets_Conditions import Meets_Conditions
 
 
@@ -79,10 +80,10 @@ def Compare_Best_Combination(successful_combinations):
 
     max_weighted_total_normalised = max(list_weighted_total_normalised, key=lambda x: x[1])
     # print(f"Max Weighted Total: {max_weighted_total_normalised}")
-    print(f"Max Weighted Normalised Total combination: {successful_combinations[max_weighted_total_normalised[0]]}")
+    # print(f"Max Weighted Normalised Total combination: {successful_combinations[max_weighted_total_normalised[0]]}")
 
     # print(f"Range Difference: {range_difference}, Charging Power Difference: {charging_power_difference}, Discharging Power Difference: {discharging_power_difference}, Mass Difference: {mass_difference}")
-    print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
+    # print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
     Averages = [average_discharging_power, average_mass, average_charging_power, average_range]
         
 
@@ -125,12 +126,12 @@ def Compare_Best_Combination(successful_combinations):
         #     print(f"{Three_out_of_4_mass_list[i]}")
 
         max_range_row_3_of_4 = max(Three_out_of_4_mass_list, key=lambda x: x[10])
-        print(f"Max Range 3/4: {max_range_row_3_of_4}")
+        # print(f"Max Range 3/4: {max_range_row_3_of_4}")
 
     max_discharging_row = max(successful_combinations, key=lambda x: x[7])
     max_charging_row = max(successful_combinations, key=lambda x: x[9])
     max_range_row = max(successful_combinations, key=lambda x: x[10])
-    print(f"Max Range: {max_range_row}")
+    # print(f"Max Range: {max_range_row}")
 
     # print(f"Average Discharging Power: {average_discharging_power}, Average Mass: {average_mass}, Average Charging Power: {average_charging_power}, Average Range: {average_range}")
 

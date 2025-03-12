@@ -167,8 +167,8 @@ successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Ba
                                                                                   req_min_V, req_max_mass_pack, req_charging_power)
 
 
-# for i in range(len(successful_combinations_1_bat)):
-#     successful_combinations.append(successful_combinations_1_bat[i])
+for i in range(len(successful_combinations_1_bat)):
+    successful_combinations.append(successful_combinations_1_bat[i])
 
 # successful_combinations_store = [battery_1_index(0), battery_1_series(1), battery_1_parallel(2),
                                 # battery_2_index(3), battery_2_series(4), battery_2_parallel(5),
@@ -211,8 +211,10 @@ if successful_combinations:
 if successful_combinations:
     max_range_row = max(successful_combinations, key=lambda x: x[10])
     min_range_row = min(successful_combinations, key=lambda x: x[10])
-    max_capacity_row = max(successful_combinations, key=lambda x: x[7])
-    min_mass_row = min(successful_combinations, key=lambda x: x[9])
+    max_capacity_row = max(successful_combinations, key=lambda x: x[6])
+    min_mass_row = min(successful_combinations, key=lambda x: x[8])
+
+    print(f"Last row: {successful_combinations[-1:]}")
 
     # print(f"Min mass: {min_mass_row}")
     # print(f"Max capacity: {max_capacity_row}")
@@ -228,7 +230,7 @@ if successful_combinations:
         battery_1 = battery_data[f"battery_{successful_combinations[i][0]}_index"]
         battery_2 = battery_data[f"battery_{successful_combinations[i][3]}_index"]
         
-        min_total_time, std_total_time, max_total_power = Charging_times(battery_data_series_parallel, battery_1, battery_2, successful_combinations)
+        min_total_time, std_total_time, max_total_power = Charging_times(battery_data_series_parallel, battery_1, battery_2)
 
 #############################################################
 
