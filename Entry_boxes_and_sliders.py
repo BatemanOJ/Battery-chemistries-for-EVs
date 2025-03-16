@@ -24,7 +24,7 @@ def Make_Entry_boxes_and_sliders(app, default_name, default_input, row, column, 
     Charging_power_slider.grid(row= row, column=column, padx=0, pady=0)
     Charging_power_slider.set(default_input)
     # Charging_power_slider.configure(command=update_Charging_power_label)
-    Charging_power_label = ctk.CTkLabel(app, text= f"{default_name} {default_input}")
+    Charging_power_label = ctk.CTkLabel(app, text= f"{default_name}{default_input}")
     Charging_power_label.grid(row= row+1, column=column)
 
     Charging_power_min_dash_label = ctk.CTkLabel(app, text="       |", font=("Helvetica", 7))

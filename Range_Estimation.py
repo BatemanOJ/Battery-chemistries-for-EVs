@@ -53,7 +53,7 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
     Cd = car_data[1]                # drag coefficient
     Af = car_data[2]                # frontal area
     Rr = car_data[3]                # rolling resistance
-    Angle_of_Car = car_data[4]     # angle of road
+    # Angle_of_Car = car_data[4]     # angle of road
 
     p = 1.225 # air density (kg/m^3)
  
@@ -97,7 +97,7 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
         
         
         Power = (EV_mass + Pack_mass) * WLTP_data[f"WLTP_{WLTP_row_index}_index"][4] + (p) * Cd * Af * (WLTP_data[f"WLTP_{WLTP_row_index}_index"][3]**2) + \
-                Rr * (EV_mass + Pack_mass) * 9.81 + (EV_mass + Pack_mass) * 9.81 * math.sin(Angle_of_Car)
+                Rr * (EV_mass + Pack_mass) * 9.81 + (EV_mass + Pack_mass) * 9.81 * math.sin(0)
         
         
         time = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]

@@ -107,7 +107,7 @@ req_charging_power = 50000
 
 
 
-def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power):
+def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
     battery_1_index = 1
     battery_2_index = 2
 
@@ -161,7 +161,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
     # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
-    car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)/135, Calculated: 179 Using 2 chems: 310
+    # car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)/135, Calculated: 179 Using 2 chems: 310
     # car_data = [1830, 0.23, 2.268, 0.015, 0] # Tesla model 3      Actual: 576, Calculated: 572
     # car_data = [2584, 0.29, 2.3, 0.015, 0] # Polestar 3              Actual: 482, Calculated: 532
 
@@ -193,10 +193,10 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # print(f"Max range: {max_range_row}")
     # print(f"Min range: {min_range_row}")
 
-    best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages \
-        = Compare_Best_Combination(successful_combinations)
+    # best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages \
+    #     = Compare_Best_Combination(successful_combinations)
 
-    print(f"Best normalised weighted row: {best_weighted_normaliesed}, Max range: {max_range_row}")
+    # print(f"Best normalised weighted row: {best_weighted_normaliesed}, Max range: {max_range_row}")
 
     if successful_combinations:
         for i in range(0, len(successful_combinations)):
@@ -207,7 +207,19 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
             
             min_total_time, std_total_time, max_total_power = Charging_times(battery_data_series_parallel, battery_1, battery_2)
 
-    return best_weighted_normaliesed[10], 0, 0, 0
+            successful_combinations[i].append(min_total_time)
+            successful_combinations[i].append(std_total_time)
+            successful_combinations[i].append(max_total_power)
+
+    print(successful_combinations[1])
+
+    best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages \
+        = Compare_Best_Combination(successful_combinations)
+
+    print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
+
+    return best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4
+  # return best_weighted_normaliesed, 
 
 #x = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)
 
