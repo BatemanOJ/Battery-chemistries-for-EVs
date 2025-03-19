@@ -1,14 +1,21 @@
 import customtkinter as ctk
 import math
+# import matplotlib.pyplot as plt
+# from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from Main_Code_2 import Calculate_Possible_Combinations
 from Set_Default_Values import Set_Default_Values_For_GUI, Values_From_Boxes
 from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, Make_Sliders_desired_values
 from Compare_Best_Combinations import Compare_Best_Combination_changed_weightings
+from Scatter_plots import plot_scatter
+
 # Create the main window
 app = ctk.CTk()
 app.title("Tool to analyse how two battery chemistries can be combined to meet desired EV characteristics")
 app.geometry("1350x700")
+
+# frame = ctk.CTkFrame(app)
+# frame.grid(row=0, column=0, padx=20, pady=20)
 
 global has_calculate_been_pressed
 has_calculate_been_pressed = 0
@@ -46,7 +53,8 @@ car_data = [1486, 0.28, 2.32, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 # min_charging_time_row = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat = Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data)
-    
+successful_combinations_1_bat = None
+successful_combinations_2_bat = None
 
 # Function to calculate based on slider and input values
 def calculate():
@@ -174,6 +182,9 @@ def calculate():
         # result_label_weightings.configure(text=f"Press Calculate to see results \n \n \n \n \n ")
         # result_label_desired_values.configure(text=f"Press Calculate to see results \n \n \n \n \n ")
         app.update()
+
+
+    
 
 def clear_column(column):
     i = 0
@@ -751,17 +762,24 @@ EV_front_area.bind("<KeyRelease>", update_sliders)
 EV_r_r.bind("<KeyRelease>", update_sliders)
 
 
-# Create a button to calculate the result
+# Button to calculate the result
 calc_button = ctk.CTkButton(app, text="Calculate", command=calculate)
 calc_button.grid(row= 11, column= 4, padx=10, pady=0)
+# Scatter plot button
+plot_button = ctk.CTkButton(app, text="Generate Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
+plot_button.grid(row=24, column=3, pady=0, padx=0)
 
+# Button to reset the weightings
 reset_weightings_button = ctk.CTkButton(app, text="Reset Weightings", command=reset_weightings)
 reset_weightings_button.grid(row= 11, column= 6, padx=0, pady=0)
 
+# Button to reset the inputs
 reset_inputs_button = ctk.CTkButton(app, text="Reset Inputs", command=reset_inputs)
 reset_inputs_button.grid(row= 11, column= 3, padx=0, pady=0)
-# Create a label to display the result
 
+
+
+# Create a label to display the result
 result_label_weightings = ctk.CTkLabel(app, text=" \n \n \n \n \n ")
 result_label_weightings.grid(row= 12, column= 6, padx=0, pady=5, rowspan=3, sticky="w") 
 
