@@ -144,20 +144,21 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     # successful_combinations_store = [battery_1_index(0), battery_1_series(1), battery_1_parallel(2),
                                     # battery_2_index(3), battery_2_series(4), battery_2_parallel(5),
-                                    # capacity(6), discharging_power(7), mass(8), charging_power(9), range(10)]
+                                    # capacity(6), discharging_power(7), mass(8), charging_power(9), range(10)
+                                    # min_total_time(11), std_total_time(12), max_total_power(13)]
 
     end_time = time.time()  # End timer
 
     elapsed_time = end_time - start_time
-    print(f"Elapsed time: {elapsed_time:.6f} seconds")
+    # print(f"Elapsed time: {elapsed_time:.6f} seconds")
             
     print(f"2-Batteries count: {count_successful_combinations}, 1-Battery count: {count_successful_combinations_1_bat}")
 
     if successful_combinations:
         max_energy_row = max(successful_combinations, key=lambda x: x[6])
         min_mass_row = min(successful_combinations, key=lambda x: x[8])
-        print(f"Min mass: {min_mass_row}")
-        print(f"Max energy: {max_energy_row}")
+        # print(f"Min mass: {min_mass_row}")
+        # print(f"Max energy: {max_energy_row}")
 
     # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
     # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
@@ -186,17 +187,12 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
         max_capacity_row = max(successful_combinations, key=lambda x: x[6])
         min_mass_row = min(successful_combinations, key=lambda x: x[8])
 
-        print(f"Last row: {successful_combinations[-1:]}")
+        # print(f"Last row: {successful_combinations[-1:]}")
 
     # print(f"Min mass: {min_mass_row}")
     # print(f"Max capacity: {max_capacity_row}")
     # print(f"Max range: {max_range_row}")
     # print(f"Min range: {min_range_row}")
-
-    # best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages \
-    #     = Compare_Best_Combination(successful_combinations)
-
-    # print(f"Best normalised weighted row: {best_weighted_normaliesed}, Max range: {max_range_row}")
 
     if successful_combinations:
         for i in range(0, len(successful_combinations)):
@@ -211,14 +207,23 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
             successful_combinations[i].append(std_total_time)
             successful_combinations[i].append(max_total_power)
 
-    print(successful_combinations[1])
+    # print(successful_combinations[1])
+    if len(successful_combinations) > 0:
+        best_weighted_normaliesed, max_range_row = Compare_Best_Combination(successful_combinations)
+        print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
+        print(f"Max, Min charging time {max(successful_combinations, key=lambda x: x[11])}")
+        print(f"Min mass {min(successful_combinations, key=lambda x: x[8])}")
+    else:
+        best_weighted_normaliesed = 0
+        max_range_row = 0
 
-    best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4, Averages \
-        = Compare_Best_Combination(successful_combinations)
+    
 
-    print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
+    # data = {successful_combinations[9], successful_combinations[11]}
+    # df = pd.DataFrame(data)
+    # df.to_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="Test", index=False)
 
-    return best_weighted_normaliesed, max_range_row, max_discharging_row, max_charging_row, max_range_row_3_of_4
+    return successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat
   # return best_weighted_normaliesed, 
 
 #x = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)

@@ -16,17 +16,29 @@ def One_Chem_Comparison(battery_1, req_energy, peak_power_req, max_pack_V_allowe
     battery_1_Wh = battery_1[14] * battery_1[16]
 
     min_battery_1_only = math.ceil(req_energy/(battery_1_Wh))
-    # min_battery_2_only = math.ceil(req_energy/(battery_2_Wh))
 
     no_battery_1 = math.ceil(min_battery_1_only/3)
-    # no_battery_2 = math.ceil(min_battery_2_only/3)
 
     energy = no_battery_1 * battery_1_Wh
     pack_mass = ((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100
 
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1}, Mass: {pack_mass}")
 
-    
+    if pack_mass > max_pack_mass:
+        while pack_mass > max_pack_mass:
+            if no_battery_1 > 1:
+                no_battery_1 -= 1
+
+
+            else:
+                success = 0
+                # print(f"Fail. Mass over limit: {mass}")
+                return success, no_battery_1, 0, energy, 0, pack_mass, 0
+            
+            pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100)
+            # print(f"Mass reducer, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+
+
     while req_energy > energy and pack_mass <= max_pack_mass:
 
         if req_energy - (no_battery_1 * battery_1_Wh) > 100 * battery_1_Wh:

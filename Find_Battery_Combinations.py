@@ -9,6 +9,7 @@ def Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, re
     count_successful_batteries = 0
     battery_1_index = 1
 
+
     while single_bat_success == 0:
 
         # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
