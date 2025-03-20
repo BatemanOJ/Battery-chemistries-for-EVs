@@ -23,7 +23,6 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
     no_battery_2 = math.ceil(min_battery_2_only/3)
 
     energy = no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh
-    battery_mass = no_battery_1 * (battery_1[21]/1000) + no_battery_2 * (battery_2[21]/1000)
     pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((no_battery_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
 
@@ -100,11 +99,17 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
             stored_no_battery_1_series = no_battery_1_series
             stored_no_battery_2_series = no_battery_2_series
             while check_energy == 1 and check_max_V == 0 and check_min_V == 1 and check_mass == 1:
-                if battery_1[15] > battery_2[15] and battery_1_Wh < battery_2_Wh:
+                if battery_1[15] > battery_2[15] and battery_1_Wh < battery_2_Wh and (max_pack_V - max_pack_V_allowed) > (battery_1[15]*10):
+                    no_battery_1_series -= 10
+
+                elif battery_1[15] < battery_2[15] and battery_1_Wh > battery_2_Wh and (max_pack_V - max_pack_V_allowed) > (battery_2[15]*10):
+                    no_battery_2_series -= 10 
+                
+                elif battery_1[15] > battery_2[15] and battery_1_Wh < battery_2_Wh:
                     no_battery_1_series -= 1
 
                 elif battery_1[15] < battery_2[15] and battery_1_Wh > battery_2_Wh:
-                    no_battery_2_series -= 1 
+                    no_battery_2_series -= 1
 
                 elif check_reduce_series == 0:
                     no_battery_1_series -= 1

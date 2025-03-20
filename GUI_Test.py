@@ -52,13 +52,22 @@ car_data = [1486, 0.28, 2.32, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 # Max_range_row = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 # min_charging_time_row = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
-successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat = Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data)
+try:
+    for successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat, total_checked in \
+    Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
+        if total_checked % 1000 == 0:
+            print(f"Total checked: {total_checked}")
+
+except StopIteration as e:
+    successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat, total_checked = e.value
+print(f"Battery 2 combinations: {count_successful_combinations}, Battery 1 combinations: {count_successful_combinations_1_bat}, Total checked: {total_checked}")
+
 successful_combinations_1_bat = None
 successful_combinations_2_bat = None
 
 # Function to calculate based on slider and input values
 def calculate():
-    result_label_calculating.configure(text=f"Calculating...")
+    result_label_calculating.configure(text=f"Calculating...\n \n")
     result_label_weightings.configure(text=f" \n \n \n \n \n ")
     result_label_desired_values.configure(text=f"")
     
@@ -150,7 +159,21 @@ def calculate():
     
     global successful_combinations, successful_combinations_both, count_successful_combinations_2_bat, count_successful_combinations_1_bat, successful_combinations_1_bat, successful_combinations_2_bat
 
-    successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat  = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, EV_metrics)
+    # for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
+    #     Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, EV_metrics):
+
+    #     result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
+    #     app.update()
+
+    try:
+        for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
+        Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
+            if total_checked % 1000 == 0:
+                result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
+                app.update()
+
+    except StopIteration as e:
+        successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked = e.value
 
     if count_successful_combinations_1_bat == 0:
         print("No 1 battery combinations found")
@@ -825,7 +848,7 @@ reset_inputs_button.grid(row= 11, column= 3, padx=0, pady=0)
 
 # Create a label to display the result
 result_label_weightings = ctk.CTkLabel(app, text=" \n \n \n \n \n ")
-result_label_weightings.grid(row= 12, column= 6, padx=0, pady=5, rowspan=3, sticky="w") 
+result_label_weightings.grid(row= 12, column= 6, padx=0, pady=5, rowspan=3) 
 
 # Create a label to display the result of desired sliders
 result_label_desired_values = ctk.CTkLabel(app, text="")

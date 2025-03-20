@@ -47,6 +47,7 @@ def Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, re
 
     multi_bat_success = 0
     count_successful_combinations = 0
+    total_checked = 0
     successful_combinations = []
 
     while multi_bat_success == 0:
@@ -93,8 +94,9 @@ def Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, re
             ])
             multi_bat_success = 0
             count_successful_combinations += 1
-
             # print(successful_combinations)
+
+        total_checked += 1
 
         if battery_1_index == 332 and battery_2_index == 333:
             break
@@ -105,4 +107,76 @@ def Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, re
             battery_2_index += 1
      
 
-    return successful_combinations, count_successful_combinations
+    return successful_combinations, count_successful_combinations, total_checked
+
+
+
+def Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power):
+    
+    battery_1_index = 1
+    battery_2_index = 2
+
+    multi_bat_success = 0
+    count_successful_combinations = 0
+    total_checked = 0
+    successful_combinations = []
+
+    while multi_bat_success == 0:
+
+        Check_battery_1_order = battery_data[f"battery_{battery_1_index}_index"][1] 
+
+        # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+
+        # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
+        multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, energy, discharging_power, mass, charging_power = \
+        Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"],\
+                                                req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power)
+        
+
+        if multi_bat_success == 1:
+            # print(f"Battery 1 Index: {battery_1_index} {battery_1_series}S {battery_1_parallel}P, Battery 2 Index: {battery_2_index} {battery_2_series}S {battery_2_parallel}P")
+            
+            # Check the battery indexes are the right way round
+            check_battery_order = Check_Battery_Order (battery_data, battery_1_index, battery_2_index, battery_1_series, battery_1_parallel, \
+                                                    battery_2_series, battery_2_parallel, energy)
+            
+            # print(f"Check Battery Order: {check_battery_order}")
+
+            # successful_combinations.append([
+            #     battery_1_index, battery_1_series, battery_1_parallel, 
+            #     battery_2_index, battery_2_series, battery_2_parallel, 
+            #     energy, discharging_power, mass, charging_power
+            # ])
+
+            # print(successful_combinations)
+
+            if check_battery_order == 0:
+                battery_hold_index = battery_1_index
+                battery_1_index_switched = battery_2_index
+                battery_2_index_switched = battery_hold_index
+            elif check_battery_order == 1:
+                battery_1_index_switched = battery_1_index
+                battery_2_index_switched = battery_2_index
+
+            successful_combinations.append([
+                battery_1_index_switched, battery_1_series, battery_1_parallel, 
+                battery_2_index_switched, battery_2_series, battery_2_parallel, 
+                energy, discharging_power, mass, charging_power
+            ])
+            multi_bat_success = 0
+            count_successful_combinations += 1
+            # print(successful_combinations)
+
+        total_checked += 1
+        yield successful_combinations, count_successful_combinations, total_checked
+
+        if battery_1_index == 332 and battery_2_index == 333:
+            break
+        elif battery_2_index == 333:
+            battery_1_index += 1
+            battery_2_index = battery_1_index + 1
+        else:
+            battery_2_index += 1
+     
+
+    return successful_combinations, count_successful_combinations, total_checked

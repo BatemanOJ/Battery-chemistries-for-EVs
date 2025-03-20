@@ -1,6 +1,7 @@
 import math
 import numpy as np  
 import scipy.integrate as spi
+import time
 
 from Get_Data_From_Cell import Get_Data_EVs # row -2, colum -1
 
@@ -90,6 +91,8 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
 
 
     # Power = m*a + (p/2)*Cd*Af*v^2 + Rr*m*g + m*g*sin(theta)
+   
+
 
     for i in range(1, len(WLTP_data)):
         WLTP_row_index = i # 1 = row 3
@@ -100,13 +103,13 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
                 Rr * (EV_mass + Pack_mass) * 9.81 + (EV_mass + Pack_mass) * 9.81 * math.sin(0)
         
         
-        time = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]
+        time_in_loop = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]
 
         Power_values.append(Power)
-        Time_values.append(time)
+        Time_values.append(time_in_loop)
         
-
     Energy_1 = np.trapz(Power_values, Time_values)
+    
     # print(f"Power: {Power_values[0:10]}, Time: {Time_values[0:10]}")
     # print(f"Energy: {Energy_1}")
 
@@ -124,13 +127,6 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
     # battery_energy_test = 111 # Polestar 3 
 
     # Range_1 = ((battery_energy_test)/Energy_1_per_km) * 0.97
-
-    # Power_1 = (EV_mass + Pack_mass_test) * WLTP_data[f"WLTP_{1}_index"][4] 
-    # Power_2 = (p/2) * Cd * Af * (WLTP_data[f"WLTP_{1}_index"][3]**2) 
-    # Power_3 = Rr * (EV_mass + Pack_mass_test) * 9.81 
-    # Power_4 = (EV_mass + Pack_mass_test) * 9.81 * math.sin(Angle_of_Car)
-    # print(f"Power 1: {Power_1}, Power 2: {Power_2}, Power 3: {Power_3}, Power 4: {Power_4}")
-    # print(EV_mass)
 
     return Range_1
           

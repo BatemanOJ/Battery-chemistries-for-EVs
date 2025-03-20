@@ -1,24 +1,21 @@
 import pandas as pd
-import math
-import numpy as np
-import time
 
 
-from Get_Data_From_Cell import Get_Data_Battery_Cell # row -3, column -2
+# from Get_Data_From_Cell import Get_Data_Battery_Cell # row -3, column -2
 # from Get_Data_From_Cell import Get_Data_EVs # row -2, colum -1
-from Series_parallel_configuration import Series_Parallel_Config_EV 
-from Range_Estimation import Range_Estimation_for_EVs
-from Get_Data_From_Cell import Get_Battery_Data_Row # gets the row of data and puts it into an array -2 on the row number
-from Two_Chemistries import Two_Chemistries
-from Two_Chem_Efficient import Two_Chem_Efficient
-from Two_Chem_Efficient_Battery_Mass_Not_Pack import Two_Chem_Efficient_Battery_Mass_Not_Pack
-from One_Chem_Comparison import One_Chem_Comparison
+# from Series_parallel_configuration import Series_Parallel_Config_EV 
+# from Range_Estimation import Range_Estimation_for_EVs
+# from Get_Data_From_Cell import Get_Battery_Data_Row # gets the row of data and puts it into an array -2 on the row number
+# from Two_Chemistries import Two_Chemistries
+# from Two_Chem_Efficient import Two_Chem_Efficient
+# from Two_Chem_Efficient_Battery_Mass_Not_Pack import Two_Chem_Efficient_Battery_Mass_Not_Pack
+# from One_Chem_Comparison import One_Chem_Comparison
 from Range_Estimation import Range_Estimation_for_Batteries
-from Check_battery_index_order import Check_Battery_Order
+# from Check_battery_index_order import Check_Battery_Order
 from Compare_Best_Combinations import Compare_Best_Combination
 from Calculate_Charging_Time import Charging_times
 
-from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery_Options
+from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery_Options, Find_Two_Battery_Options_Test
 
 
 
@@ -134,8 +131,15 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     print("WLTP Data Imported")
 
-    successful_combinations, count_successful_combinations_2_bat = Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power)
+    # successful_combinations, count_successful_combinations_2_bat, total_checked = Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
+    #                                                                                 req_min_V, req_max_mass_pack, req_charging_power)
+    end_time_2_bat = time.time()
+    for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, \
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power):
+        yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
+        
+    print(f"total checked: {total_checked}")
+    end_time_2_bat_test = time.time()  # End timer
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
                                                                                     req_min_V, req_max_mass_pack, req_charging_power)
@@ -151,8 +155,13 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     end_time_after_finding_combinations = time.time()  # End timer
 
-    elapsed_time = end_time_after_finding_combinations - start_time
-    print(f"Elapsed time: {elapsed_time:.6f} seconds")
+    elapsed_time_1_bat = end_time_after_finding_combinations - end_time_2_bat_test
+    elapsed_time_test = end_time_2_bat_test - end_time_2_bat
+    elapsed_time_2_bat = end_time_2_bat - start_time
+
+    print(f"Elapsed time 1 bat: {elapsed_time_1_bat:.6f} seconds")
+    print(f"Elapsed time 2 bat: {elapsed_time_2_bat:.6f} seconds")
+    print(f"Elapsed time 2 bat test: {elapsed_time_test:.6f} seconds")
             
     print(f"2-Batteries count: {count_successful_combinations_2_bat}, 1-Battery count: {count_successful_combinations_1_bat}")
 
@@ -179,7 +188,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
             # print(f"Battery number series parallel {successful_combinations[i][0], successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][3], successful_combinations[i][4], successful_combinations[i][5]}")
 
-            Range = Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
+            Range= Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
 
             successful_combinations[i].append(Range)
 
@@ -227,9 +236,9 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     
     if len(successful_combinations) > 0:
         best_weighted_normaliesed, max_range_row = Compare_Best_Combination(successful_combinations)
-        print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
-        print(f"Max, Min charging time {max(successful_combinations, key=lambda x: x[11])}")
-        print(f"Min mass {min(successful_combinations, key=lambda x: x[8])}")
+        # print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
+        # print(f"Max, Min charging time {max(successful_combinations, key=lambda x: x[11])}")
+        # print(f"Min mass {min(successful_combinations, key=lambda x: x[8])}")
     else:
         best_weighted_normaliesed = 0
         max_range_row = 0
@@ -242,7 +251,8 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # df = pd.DataFrame(data)
     # df.to_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="Test", index=False)
 
-    return successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat
+    yield successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked
+    
   # return best_weighted_normaliesed, 
 
 #x = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)

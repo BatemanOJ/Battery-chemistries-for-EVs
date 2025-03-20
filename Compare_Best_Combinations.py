@@ -106,7 +106,7 @@ def Compare_Best_Combination(successful_combinations):
     Averages = [average_discharging_power, average_mass, average_charging_power, average_range, average_min_charging_time]
     medians = [median_discharging_power, median_mass, median_charging_power, median_range, median_min_charging_time]
 
-    print(f"Averages: {Averages} \nMedians: {medians}")
+    # print(f"Averages: {Averages} \nMedians: {medians}")
         
 
     
