@@ -132,7 +132,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     print("WLTP Data Imported")
 
-    successful_combinations, count_successful_combinations = Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
+    successful_combinations, count_successful_combinations_2_bat = Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
                                                                                     req_min_V, req_max_mass_pack, req_charging_power)
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
@@ -150,9 +150,9 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     end_time = time.time()  # End timer
 
     elapsed_time = end_time - start_time
-    # print(f"Elapsed time: {elapsed_time:.6f} seconds")
+    print(f"Elapsed time: {elapsed_time:.6f} seconds")
             
-    print(f"2-Batteries count: {count_successful_combinations}, 1-Battery count: {count_successful_combinations_1_bat}")
+    print(f"2-Batteries count: {count_successful_combinations_2_bat}, 1-Battery count: {count_successful_combinations_1_bat}")
 
     if successful_combinations:
         max_energy_row = max(successful_combinations, key=lambda x: x[6])
@@ -223,7 +223,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # df = pd.DataFrame(data)
     # df.to_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="Test", index=False)
 
-    return successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat
+    return successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat
   # return best_weighted_normaliesed, 
 
 #x = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)

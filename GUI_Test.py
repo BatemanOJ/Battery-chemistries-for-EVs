@@ -148,19 +148,34 @@ def calculate():
     print(f"Reqired values: {desired_EV_characteristics}")
     print(f"EV values{EV_metrics}")
     
-    global successful_combinations, successful_combinations_both, count_successful_combinations_both, count_successful_combinations_1_bat, successful_combinations_1_bat, successful_combinations_2_bat
+    global successful_combinations, successful_combinations_both, count_successful_combinations_2_bat, count_successful_combinations_1_bat, successful_combinations_1_bat, successful_combinations_2_bat
 
-    successful_combinations, best_weighted_normaliesed, count_successful_combinations_both, count_successful_combinations_1_bat  = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, EV_metrics)
+    successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat  = Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, EV_metrics)
 
-    successful_combinations_1_bat = successful_combinations[-count_successful_combinations_1_bat:]
-    successful_combinations_2_bat = successful_combinations[:-count_successful_combinations_1_bat]
-    successful_combinations_both = successful_combinations
+    if count_successful_combinations_1_bat == 0:
+        print("No 1 battery combinations found")
+        successful_combinations_1_bat = 0
+        successful_combinations_2_bat = successful_combinations
+        successful_combinations_both = successful_combinations
+        
+    elif count_successful_combinations_2_bat == 0:
+        print("No 2 battery combinations found")
+
+        successful_combinations_1_bat = successful_combinations
+        successful_combinations_2_bat = 0
+        successful_combinations_both = successful_combinations
+
+    else:
+        successful_combinations_1_bat = successful_combinations[-count_successful_combinations_1_bat:]
+        successful_combinations_2_bat = successful_combinations[:-count_successful_combinations_1_bat]
+        successful_combinations_both = successful_combinations
+
     if len(successful_combinations) > 0:
         options = len(successful_combinations)
-        # clear_column(7)
+        clear_column(7)
         update_numbers_for_desired_sliders()
         make_desired_sliders() # Make the desired sliders using the values calculated for the max and middlie values
-        result_label_desired_values.configure(text=f"Adjust desired targets to see result")
+        # result_label_desired_values.configure(text=f"Adjust desired targets to see result")
         desired_EV_outputs_title_label.configure(text="Please adjust sliders for desired\nEV outputs")
 
         # Set the weighting and desired sliders to start working
@@ -176,7 +191,7 @@ def calculate():
         
 
         result_label_weightings.configure(text=f"Options: {options}\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
-        result_label_calculating.configure(text=f"2 battery combinations: {count_successful_combinations_both}\n1 battery combinations: {count_successful_combinations_1_bat}")
+        result_label_calculating.configure(text=f"2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
     else:
         result_label_calculating.configure(text=f"No combinations found")
         # result_label_weightings.configure(text=f"Press Calculate to see results \n \n \n \n \n ")
@@ -186,13 +201,19 @@ def calculate():
 
     
 
+# def clear_column(column):
+#     for widget in app.winfo_children():
+#         if widget.grid_info().get("column") == column:
+#             widget.grid_remove()
+
 def clear_column(column):
-    i = 0
     for widget in app.winfo_children():
-        if widget.grid_info().get("column") == column:
-            if i < 9:
-                widget.grid_remove()
-                i += 1
+        if isinstance(widget, ctk.CTkToplevel):
+            continue
+        grid_info = widget.grid_info()
+        if grid_info.get("column") == column and 1 <= grid_info.get("row") <= 8:
+            widget.grid_remove()
+                
 
 def check_selected(value):
     checkbox_Only_1_battery.deselect()
@@ -203,21 +224,35 @@ def check_selected(value):
 
     if value == 2:
         checkbox_Only_1_battery.select()
-        global successful_combinations
-        successful_combinations = successful_combinations_1_bat
-        on_desired_slider_release()
-    
+        if successful_combinations_1_bat != 0:
+            global successful_combinations
+            successful_combinations = successful_combinations_1_bat
+            on_desired_slider_release()
+        else:
+            print("No 1 battery combinations found")
+            result_label_desired_values.configure(text=f"No 1 Battery Options")
+
     elif value == 1:
         checkbox_Only_2_batteries.select()
-        Only_2_bat()
-    
+        if successful_combinations_2_bat != 0:
+            Only_2_bat()
+        else:
+            print("No 2 battery combinations found")
+            result_label_desired_values.configure(text=f"No 2 Battery Options")
+          
     elif value == 3:
         checkbox_both_batteries.select()
-        Both_bat()
+        if successful_combinations_2_bat != 0:
+            Both_bat()
+        else:
+            print("No battery combinations found")
+            result_label_desired_values.configure(text=f"No Battery Options")
+       
         
 def Only_2_bat():
     global successful_combinations
     successful_combinations = successful_combinations_2_bat
+    print(successful_combinations)
     on_desired_slider_release()
 
 def Both_bat():
@@ -301,45 +336,26 @@ def update_min_pack_mass_weighting_label(value):
 #     global min_charge_power_weighting
 #     min_charge_power_weighting = value
 
-# Total Energy
-total_energy = ctk.CTkEntry(app, placeholder_text="Total Energy", width=160, height=28)
-total_energy.grid(row= 3, column= 1, padx=10, pady=10)
-total_energy_slider = ctk.CTkSlider(app, from_= 0, to=150000, number_of_steps=150)
-total_energy_slider.grid(row= 3, column=2, padx=10, pady=10)
-total_energy_slider.set(input_energy)
-# total_energy_slider.configure(command=update_total_energy_label)
-total_energy_label = ctk.CTkLabel(app, text=input_energy)
-total_energy_label.grid(row= 4, column=2)
 
-# Desired EV characteristics
-# EV_range, EV_range_slider, EV_range_label = Make_Entry_boxes_and_sliders(app, f"Range: ", input_range, 1, 2, 1000, 500, 0, 200, "Range (km)")
-total_energy, total_energy_slider, total_energy_label = Make_Entry_boxes_and_sliders(app, f"Energy: ", input_energy, 1, 2, 150000, 75000, 0, 150, "Total Energy (Wh)")
-Pack_mass, Pack_mass_slider, Pack_mass_label = Make_Entry_boxes_and_sliders(app, f"Pack Mass: ", input_max_mass_pack, 3, 2, 1000, 500, 0, 200, "Pack Mass (kg)")
-Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum Voltage: ", input_max_V, 5, 2, 1000, 500, 0, 200, "Maximum Voltage (V)")
-Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage: ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
-Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power: ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
-Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power: ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
-
-# EV_range_slider.configure(command=update_range_label)
-total_energy_slider.configure(command=update_total_energy_label)
-Pack_mass_slider.configure(command=update_Pack_mass_label)
-Max_V_slider.configure(command=update_Max_V_label)
-Min_V_slider.configure(command=update_Min_V_label)
-Discharging_power_slider.configure(command=update_Discharging_power_label)
-Charging_power_slider.configure(command=update_Charging_power_label)
 
 def update_numbers_for_desired_sliders():
-    global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass, Max_range_row, min_charging_time_row, max_charging_time_row, max_discharging_power_row, Min_mass_row
-    desired_range = 250
-    desired_min_charging_time = 35
-    desired_max_discharging_power = (Discharging_power_slider.get() + 10000)
-    desired_max_mass = Pack_mass_slider.get()
-
-    Max_range_row = max(successful_combinations, key=lambda x: x[10])
+    global min_range_row, max_range_row, min_charging_time_row, max_charging_time_row, max_discharging_power_row, min_discharging_power_row, max_mass_row, min_mass_row
+    
+    max_range_row = max(successful_combinations, key=lambda x: x[10])
+    min_range_row = min(successful_combinations, key=lambda x: x[10])
     min_charging_time_row = min(successful_combinations, key=lambda x: x[11])
     max_charging_time_row = max(successful_combinations, key=lambda x: x[11])
     max_discharging_power_row = max(successful_combinations, key=lambda x: x[7])
-    Min_mass_row = min(successful_combinations, key=lambda x: x[8])
+    min_discharging_power_row = min(successful_combinations, key=lambda x: x[7])
+    min_mass_row = min(successful_combinations, key=lambda x: x[8])
+    max_mass_row = max(successful_combinations, key=lambda x: x[8])
+
+    global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass
+    desired_range = min_range_row[10]
+    desired_min_charging_time = max_charging_time_row[11]
+    desired_max_discharging_power = min_discharging_power_row[7]
+    desired_max_mass = max_mass_row[8]
+
 
 
 def update_desired_range_label(value):
@@ -363,27 +379,7 @@ def update_desired_max_mass_label(value):
     desired_max_mass = value
 
 def update_sliders(event=None):
-    # if checkbox_Boxes_to_sliders.get() == 1:  # Check if the checkbox is ticked
-        # desired_EV_characteristics = [EV_range.get(), total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
-
-    # for i in desired_EV_characteristics:
     try:
-        # value_EV_range_empty = EV_range.get()
-        # if value_EV_range_empty == "":
-        #     EV_range_slider.set(input_range)
-        #     update_range_label(input_range)
-        # else:
-        #     try: 
-        #         value_EV_range = float(EV_range.get())  # Get the value from the entry box
-        #         if EV_range_slider._from_ <= value_EV_range <= EV_range_slider._to:  # Check if the value is within the slider's range
-        #             EV_range_slider.set(value_EV_range)  # Set the slider to the value
-        #             update_range_label(value_EV_range)
-        #         else:
-        #             update_range_label(value_EV_range)
-
-        #     except: 
-        #         print("non number entered in EV range")
-        #         non_number_message()
     
         value_total_energy_empty = total_energy.get()
         if value_total_energy_empty == "":
@@ -596,6 +592,17 @@ def reset_inputs():
     Discharging_power_slider.set(input_discharging_power)
     Charging_power_slider.set(input_charging_power)
 
+    total_energy.delete(0, 'end')
+    Pack_mass.delete(0, 'end')
+    Max_V.delete(0, 'end') 
+    Min_V.delete(0, 'end')
+    Discharging_power.delete(0, 'end')
+    Charging_power.delete(0, 'end')
+    EV_mass.delete(0, 'end')
+    EV_drag.delete(0, 'end')
+    EV_front_area.delete(0, 'end')
+    EV_r_r.delete(0, 'end')
+
     update_EV_mass_label(car_data[0])
     update_EV_drag_label(car_data[1])
     update_EV_front_area_label(car_data[2])
@@ -610,9 +617,9 @@ def reset_inputs():
 
 def on_desired_slider_release(event=None):
     desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
-    print(desired_values)
+    print(desired_values, has_calculate_been_pressed)
     if has_calculate_been_pressed == 1:
-        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power/1000 and row[8] <= desired_max_mass]
         if matching_rows:
             
             # print(f"Matching rows length: {len(matching_rows)}")
@@ -628,7 +635,32 @@ def on_desired_slider_release(event=None):
     # result_label.configure(text=f"Range: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
 
 
+# Total Energy
+total_energy = ctk.CTkEntry(app, placeholder_text="Total Energy", width=160, height=28)
+total_energy.grid(row= 3, column= 1, padx=10, pady=10)
+total_energy_slider = ctk.CTkSlider(app, from_= 0, to=150000, number_of_steps=150)
+total_energy_slider.grid(row= 3, column=2, padx=10, pady=10)
+total_energy_slider.set(input_energy)
+# total_energy_slider.configure(command=update_total_energy_label)
+total_energy_label = ctk.CTkLabel(app, text=input_energy)
+total_energy_label.grid(row= 4, column=2)
 
+# Desired EV characteristics
+# EV_range, EV_range_slider, EV_range_label = Make_Entry_boxes_and_sliders(app, f"Range: ", input_range, 1, 2, 1000, 500, 0, 200, "Range (km)")
+total_energy, total_energy_slider, total_energy_label = Make_Entry_boxes_and_sliders(app, f"Energy: ", input_energy, 1, 2, 150000, 75000, 0, 150, "Total Energy (Wh)")
+Pack_mass, Pack_mass_slider, Pack_mass_label = Make_Entry_boxes_and_sliders(app, f"Pack Mass: ", input_max_mass_pack, 3, 2, 1000, 500, 0, 200, "Pack Mass (kg)")
+Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum Voltage: ", input_max_V, 5, 2, 1000, 500, 0, 200, "Maximum Voltage (V)")
+Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage: ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
+Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power: ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
+Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power: ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
+
+# EV_range_slider.configure(command=update_range_label)
+total_energy_slider.configure(command=update_total_energy_label)
+Pack_mass_slider.configure(command=update_Pack_mass_label)
+Max_V_slider.configure(command=update_Max_V_label)
+Min_V_slider.configure(command=update_Min_V_label)
+Discharging_power_slider.configure(command=update_Discharging_power_label)
+Charging_power_slider.configure(command=update_Charging_power_label)
 
 
 # EV metrics
@@ -716,35 +748,37 @@ def make_desired_sliders():
     Desired_range_label = ctk.CTkLabel(app, text=default_weighting[0])
     Desired_range_label.grid(row= 2, column=7)
 
-    Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range: ", desired_range, 1, 7, math.ceil(Max_range_row[10]/10)*10, (math.ceil(Max_range_row[10]/10)*10)/2, 0, (math.ceil(Max_range_row[10]/10)*10)/5)
+    Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range: ", 0, 1, 7, math.ceil(Max_range_row[10]/10)*10, (math.ceil(Max_range_row[10]/10)*10)/2, 0, (math.ceil(Max_range_row[10]/10)*10)/5)
     Desired_range_slider.configure(command=update_desired_range_label)
     Desired_range_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
-    Desired_min_charging_time_slider, Desired_min_charging_time_label = Make_Sliders_desired_values(app, "Charging Time (10-80%) (mins): ", desired_min_charging_time, 3, 7, (math.ceil(max_charging_time_row[11]/10)*10), (math.ceil(max_charging_time_row[11]/10)*10)/2, 0, (math.ceil(max_charging_time_row[11]/10)*10))
+    Desired_min_charging_time_slider, Desired_min_charging_time_label = Make_Sliders_desired_values(app, "Charging Time (10-80%) (mins): ", max_charging_time_row[11], 3, 7, (math.ceil(max_charging_time_row[11]/10)*10), (math.ceil(max_charging_time_row[11]/10)*10)/2, 0, (math.ceil(max_charging_time_row[11]/10)*10))
     Desired_min_charging_time_slider.configure(command=update_desired_min_charging_time_label)
     Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
-    if math.ceil((max_discharging_power_row[7]/1000)/10)*10 == math.ceil(((desired_max_discharging_power-10000)/1000)/10)*10:
-        Desired_max_discharge_power_slider, Desired_max_discharge_power_label = Make_Sliders_desired_values(app, "Max Discharge Power (kW): ", (desired_max_discharging_power/1000), 5, 7, (desired_max_discharging_power/1000)+1, (desired_max_discharging_power/1000), (desired_max_discharging_power/1000)-1, 2)
+    if math.ceil((max_discharging_power_row[7]/1000)/10)*10 == math.ceil((min_discharging_power_row[7]/1000)/10)*10:
+        Desired_max_discharge_power_slider, Desired_max_discharge_power_label = Make_Sliders_desired_values(app, "Max Discharge Power (kW): ", (min_discharging_power_row[7]/1000), 5, 7, (max_discharging_power_row[7]/1000)+1, (max_discharging_power_row[7]/1000), (max_discharging_power_row[7]/1000)-1, 2)
     else:
-        Desired_max_discharge_power_slider, Desired_max_discharge_power_label = Make_Sliders_desired_values(app, "Max Discharge Power (kW): ", (desired_max_discharging_power/1000), 5, 7,\
+        Desired_max_discharge_power_slider, Desired_max_discharge_power_label = Make_Sliders_desired_values(app, "Max Discharge Power (kW): ", (min_discharging_power_row[7]/1000), 5, 7,\
                                                                                                             math.ceil((max_discharging_power_row[7]/1000)/10)*10, \
-                                                                                                            (math.ceil((max_discharging_power_row[7]/1000)/10)*10 - (math.ceil(((desired_max_discharging_power-10000)/1000)/10)*10)/2) + (math.ceil(((desired_max_discharging_power-10000)/1000)/10)*10), \
-                                                                                                            math.ceil(((desired_max_discharging_power-10000)/1000)/10)*10, \
-                                                                                                            (math.ceil((max_discharging_power_row[7]/1000)/10)*10)-(math.ceil(((desired_max_discharging_power-10000)/1000)/10)*10)/10)
+                                                                                                            (math.ceil((max_discharging_power_row[7]/1000)/10)*10 - (math.floor((min_discharging_power_row[7]/1000)/10)*10)/2) + (math.floor(((min_discharging_power_row[7])/1000)/10)*10), \
+                                                                                                            math.floor(((min_discharging_power_row[7])/1000)/10)*10, \
+                                                                                                            (math.ceil((max_discharging_power_row[7]/1000)/10)*10)-(math.floor((min_discharging_power_row[7]/1000)/10)*10)/10)
     Desired_max_discharge_power_slider.configure(command=update_desired_max_discharge_power_label)
     Desired_max_discharge_power_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
-    if desired_max_mass == ((desired_max_mass - (math.ceil(Min_mass_row[8]/10)*10))/2) + (math.ceil(Min_mass_row[8]/10)*10):
-        Desired_max_mass_slider, Desired_max_mass_label = Make_Sliders_desired_values(app, "Max Mass (kg): ", (desired_max_mass), 7, 7, desired_max_mass+1, desired_max_mass, desired_max_mass-1, 2)
+    if max_mass_row[8] == min_mass_row[8]:
+        Desired_max_mass_slider, Desired_max_mass_label = Make_Sliders_desired_values(app, "Max Mass (kg): ", math.ceil(max_mass_row[8]), 7, 7, math.ceil(max_mass_row[8])+1, math.ceil(max_mass_row[8]), math.ceil(max_mass_row[8])-1, 2)
     else:
-        Desired_max_mass_slider, Desired_max_mass_label = Make_Sliders_desired_values(app, "Max Mass (kg): ", (desired_max_mass), 7, 7, \
-                                                                                    desired_max_mass, \
-                                                                                    ((desired_max_mass - (math.ceil(Min_mass_row[8]/10)*10))/2) + (math.ceil(Min_mass_row[8]/10)*10), \
-                                                                                    (math.ceil(Min_mass_row[8]/10)*10), \
-                                                                                    desired_max_mass - (math.ceil(Min_mass_row[8]/10)*10))
+        Desired_max_mass_slider, Desired_max_mass_label = Make_Sliders_desired_values(app, "Max Mass (kg): ", math.ceil(max_mass_row[8]), 7, 7, \
+                                                                                    math.ceil(max_mass_row[8]), \
+                                                                                    ((math.ceil(max_mass_row[8]) - (math.ceil(min_mass_row[8])))/2) + (math.ceil(min_mass_row[8])), \
+                                                                                    (math.ceil(min_mass_row[8])), \
+                                                                                    (math.ceil(max_mass_row[8])) - (math.ceil(min_mass_row[8])))
     Desired_max_mass_slider.configure(command=update_desired_max_mass_label)
     Desired_max_mass_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
+    
+    on_desired_slider_release()
 
     
 

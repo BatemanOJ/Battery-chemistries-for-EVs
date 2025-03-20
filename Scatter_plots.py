@@ -5,9 +5,8 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 
 def plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat):
-    print(f"Trying to scatter")
     
-    if successful_combinations_1_bat != None and successful_combinations_2_bat != None:
+    if successful_combinations_1_bat != None or successful_combinations_2_bat != None:
         range_data_bat_1 = [row[10] for row in successful_combinations_1_bat]
         charging_data_bat_1 = [row[11] for row in successful_combinations_1_bat]
         range_data_bat_2 = [row[10] for row in successful_combinations_2_bat]
