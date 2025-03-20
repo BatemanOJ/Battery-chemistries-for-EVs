@@ -86,7 +86,7 @@ from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery
 
 # Checks using battery mass not pack mass
 
-start_time = time.time()
+
 
 # # Rivian R1T
 # req_capacity = 135000
@@ -108,8 +108,10 @@ req_charging_power = 50000
 
 
 def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
-    battery_1_index = 1
-    battery_2_index = 2
+    
+    import time
+    start_time = time.time()
+
 
     print("Started")
     battery_data = {}
@@ -147,9 +149,9 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
                                     # capacity(6), discharging_power(7), mass(8), charging_power(9), range(10)
                                     # min_total_time(11), std_total_time(12), max_total_power(13)]
 
-    end_time = time.time()  # End timer
+    end_time_after_finding_combinations = time.time()  # End timer
 
-    elapsed_time = end_time - start_time
+    elapsed_time = end_time_after_finding_combinations - start_time
     print(f"Elapsed time: {elapsed_time:.6f} seconds")
             
     print(f"2-Batteries count: {count_successful_combinations_2_bat}, 1-Battery count: {count_successful_combinations_1_bat}")
@@ -166,6 +168,8 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # car_data = [1830, 0.23, 2.268, 0.015, 0] # Tesla model 3      Actual: 576, Calculated: 572
     # car_data = [2584, 0.29, 2.3, 0.015, 0] # Polestar 3              Actual: 482, Calculated: 532
 
+    start_time_range = time.time()
+    
 
     if successful_combinations:
         for i in range(0, len(successful_combinations)):
@@ -180,6 +184,11 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
             successful_combinations[i].append(Range)
 
             # print(f"Range {i}: {Range} km")
+    
+    end_time_range = time.time()  # End timer
+
+    elapsed_time = end_time_range - start_time_range
+    print(f"Elapsed time for range estimation: {elapsed_time:.6f} seconds")
 
     if successful_combinations:
         max_range_row = max(successful_combinations, key=lambda x: x[10])
@@ -193,7 +202,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # print(f"Max capacity: {max_capacity_row}")
     # print(f"Max range: {max_range_row}")
     # print(f"Min range: {min_range_row}")
-
+    atart_time_charging = time.time()
     if successful_combinations:
         for i in range(0, len(successful_combinations)):
 
@@ -207,7 +216,15 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
             successful_combinations[i].append(std_total_time)
             successful_combinations[i].append(max_total_power)
 
+    end_time_charging = time.time()  # End timer
+
+    elapsed_time = end_time_charging - atart_time_charging
+    print(f"Elapsed time for charging times estimation: {elapsed_time:.6f} seconds")
+
     # print(successful_combinations[1])
+    start_time_before_comparing = time.time()  # End timer
+
+    
     if len(successful_combinations) > 0:
         best_weighted_normaliesed, max_range_row = Compare_Best_Combination(successful_combinations)
         print(f"Best normalised weighted row: {best_weighted_normaliesed},\nMax range: {max_range_row}")
@@ -217,7 +234,9 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
         best_weighted_normaliesed = 0
         max_range_row = 0
 
-    
+    end_time_after_comparing = time.time()
+    elapsed_time_2 = end_time_after_comparing - start_time_before_comparing
+    print(f"Elapsed time for comparison: {elapsed_time_2:.6f} seconds")
 
     # data = {successful_combinations[9], successful_combinations[11]}
     # df = pd.DataFrame(data)
