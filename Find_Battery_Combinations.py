@@ -100,9 +100,9 @@ def Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, re
 
         total_checked += 1
 
-        if battery_1_index == 332 and battery_2_index == 333:
+        if battery_1_index == 331 and battery_2_index == 332:
             break
-        elif battery_2_index == 333:
+        elif battery_2_index == 332:
             battery_1_index += 1
             battery_2_index = battery_1_index + 1
         else:
@@ -172,9 +172,9 @@ def Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_powe
         total_checked += 1
         yield successful_combinations, count_successful_combinations, total_checked
 
-        if battery_1_index == 332 and battery_2_index == 333:
+        if battery_1_index == 331 and battery_2_index == 332:
             break
-        elif battery_2_index == 333:
+        elif battery_2_index == 332:
             battery_1_index += 1
             if battery_1_index in batteries_to_be_removed:
                 battery_1_index += 1
@@ -251,9 +251,9 @@ def Find_Two_Battery_Options_Test_No_Removals(battery_data, req_energy, req_disc
         total_checked += 1
         yield successful_combinations, count_successful_combinations, total_checked
 
-        if battery_1_index == 332 and battery_2_index == 333:
+        if battery_1_index == 331 and battery_2_index == 332:
             break
-        elif battery_2_index == 333:
+        elif battery_2_index == 332:
             battery_1_index += 1
             # if battery_1_index in batteries_to_be_removed:
             #     battery_1_index += 1

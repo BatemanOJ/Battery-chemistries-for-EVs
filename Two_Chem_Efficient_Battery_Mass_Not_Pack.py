@@ -24,7 +24,8 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
 
     energy = no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh
     pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((no_battery_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
-    # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+    # print(no_battery_1, battery_1[21], battery_1[40], no_battery_2, battery_2[21], battery_2[40])
+    # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}")
 
     if pack_mass > max_mass:
         while pack_mass > max_mass:
@@ -40,7 +41,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
                 return success, no_battery_1, 0, no_battery_2, 0, energy, 0, pack_mass, 0
             
             pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((no_battery_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
-            # print(f"Mass reducer, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+            # print(f"Mass reducer, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}")
 
     while req_energy > energy and pack_mass <= max_mass:
 
@@ -73,7 +74,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
             return success, no_battery_1, 0, no_battery_2, 0, energy, 0, pack_mass, 0
         # else:
             
-    # print(f"energy: {energy} Bat/teries: {no_battery_1, no_battery_2}, Mass: {mass}")
+    # print(f"Energy increaser, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}")
 
     max_pack_V = battery_1[15] * no_battery_1 + battery_2[15] * no_battery_2
 
@@ -184,7 +185,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
 
     peak_power_generated = no_battery_1_series * no_battery_1_parallel * battery_1_peak_power + \
                            no_battery_2_series * no_battery_2_parallel * battery_2_peak_power 
-    # print(f"Power: {peak_power_generated}, Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
+    # print(f"Power: {peak_power_generated}, Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}")
 
     while peak_power_req > peak_power_generated:# and check_mass == 1 and check_max_V == 1:
         
@@ -224,7 +225,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
-    # print(f"Discharging Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
+    # print(f"Discharging Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {pack_mass}")
     
     battery_1_peak_charge_power = battery_1[16] * battery_1[23]
     battery_2_peak_charge_power = battery_2[16] * battery_2[23]
@@ -350,5 +351,5 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         
     success = 1
     # print(success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, energy, peak_power_generated, mass, peak_charge_power_generated)
-
+    # print("Got to return final")
     return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, energy, peak_power_generated, pack_mass, peak_charge_power_generated

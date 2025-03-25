@@ -76,7 +76,7 @@ def calculate():
     result_label_desired_values.configure(text=f"")
     
 
-    # global has_calculate_been_pressed, car_data
+    global has_calculate_been_pressed, car_data, desired_EV_characteristics
     has_calculate_been_pressed = 1
 
     app.update()
