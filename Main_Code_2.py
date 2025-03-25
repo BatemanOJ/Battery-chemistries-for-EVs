@@ -15,7 +15,7 @@ from Range_Estimation import Range_Estimation_for_Batteries
 from Compare_Best_Combinations import Compare_Best_Combination
 from Calculate_Charging_Time import Charging_times
 
-from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery_Options, Find_Two_Battery_Options_Test
+from Find_Battery_Combinations import Find_One_Battery_Options, Find_Two_Battery_Options, Find_Two_Battery_Options_Test, Find_Two_Battery_Options_Test_No_Removals
 
 
 
@@ -120,6 +120,22 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
     print("Battery Data Imported")
 
+    batteries_to_be_removed = []
+    print(req_energy/req_max_mass_pack)
+
+
+    for i in range(1, 332):
+
+        energy_density = (battery_data[f"battery_{i}_index"][14] * battery_data[f"battery_{i}_index"][16])/ (battery_data[f"battery_{i}_index"][21]/1000) # Energy density
+
+        if energy_density < (req_energy/req_max_mass_pack)/1.2:
+            batteries_to_be_removed.append(i)
+
+    print(f"Batteries to be removed: {batteries_to_be_removed}")
+
+    # for i in range(len(batteries_to_be_removed)):
+    #     battery_data.pop(f"battery_{batteries_to_be_removed[i]}_index")
+
     WLTP_data = {}
 
     WLTP_database = pd.read_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="WLTP Acc")
@@ -135,14 +151,20 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     #                                                                                 req_min_V, req_max_mass_pack, req_charging_power)
     end_time_2_bat = time.time()
     for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power):
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed):
         yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
+
+    if len(successful_combinations) == 0 and len(batteries_to_be_removed) > 1:
+        for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test_No_Removals(battery_data, req_energy, req_discharging_power, req_max_V, \
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power):
+            yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
+    
         
     print(f"total checked: {total_checked}")
     end_time_2_bat_test = time.time()  # End timer
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power)
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed)
 
 
     for i in range(len(successful_combinations_1_bat)):
@@ -158,10 +180,12 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     elapsed_time_1_bat = end_time_after_finding_combinations - end_time_2_bat_test
     elapsed_time_test = end_time_2_bat_test - end_time_2_bat
     elapsed_time_2_bat = end_time_2_bat - start_time
+    total_time = end_time_after_finding_combinations - start_time
 
-    print(f"Elapsed time 1 bat: {elapsed_time_1_bat:.6f} seconds")
-    print(f"Elapsed time 2 bat: {elapsed_time_2_bat:.6f} seconds")
-    print(f"Elapsed time 2 bat test: {elapsed_time_test:.6f} seconds")
+    # print(f"Elapsed time 1 bat: {elapsed_time_1_bat:.6f} seconds")
+    # print(f"Elapsed time 2 bat: {elapsed_time_2_bat:.6f} seconds")
+    # print(f"Elapsed time 2 bat test: {elapsed_time_test:.6f} seconds")
+    print(f"Total time: {total_time:.2f} seconds")
             
     print(f"2-Batteries count: {count_successful_combinations_2_bat}, 1-Battery count: {count_successful_combinations_1_bat}")
 
@@ -250,6 +274,17 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     # data = {successful_combinations[9], successful_combinations[11]}
     # df = pd.DataFrame(data)
     # df.to_excel("Battery database from open source_CellDatabase_v6.xlsx", sheet_name="Test", index=False)
+    count = []
+    for i in range(len(successful_combinations)):
+        for r in range(len(batteries_to_be_removed)):
+            if successful_combinations[i][0] == batteries_to_be_removed[r] or successful_combinations[i][3] == batteries_to_be_removed[r]:
+                count.append(i)
+    
+    print(f"Count: {len(count)}")
+    for i in count:
+        print(successful_combinations[i])
+
+
 
     yield successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked
     

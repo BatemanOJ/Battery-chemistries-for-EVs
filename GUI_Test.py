@@ -1,5 +1,7 @@
 import customtkinter as ctk
 import math
+import pandas as pd
+from openpyxl import load_workbook
 # import matplotlib.pyplot as plt
 # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -17,7 +19,7 @@ app.geometry("1350x700")
 # frame = ctk.CTkFrame(app)
 # frame.grid(row=0, column=0, padx=20, pady=20)
 
-global has_calculate_been_pressed
+global has_calculate_been_pressed, car_data, desired_EV_characteristics
 has_calculate_been_pressed = 0
 
 # Nissan Leaf
@@ -29,6 +31,8 @@ input_min_V = 240
 input_max_mass_battery = 185.5
 input_max_mass_pack = 315
 input_charging_power = 50000
+
+desired_EV_characteristics = [0, input_energy, input_max_mass_pack, input_max_V, input_min_V, input_discharging_power, input_charging_power]
 
 # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
 # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
@@ -55,7 +59,7 @@ car_data = [1486, 0.28, 2.32, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 try:
     for successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat, total_checked in \
     Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
-        if total_checked % 1000 == 0:
+        if total_checked == 10:
             print(f"Total checked: {total_checked}")
 
 except StopIteration as e:
@@ -68,17 +72,17 @@ successful_combinations_2_bat = None
 # Function to calculate based on slider and input values
 def calculate():
     result_label_calculating.configure(text=f"Calculating...\n \n")
-    result_label_weightings.configure(text=f" \n \n \n \n \n ")
+    result_label_weightings.configure(text=f" \n \n \n \n \n \n")
     result_label_desired_values.configure(text=f"")
     
 
-    global has_calculate_been_pressed
+    # global has_calculate_been_pressed, car_data
     has_calculate_been_pressed = 1
 
     app.update()
     
 
-    print(car_data[2], car_data)
+    # print(car_data[2], car_data)
 
     # [float(EV_range.get()), float(total_energy.get()), float(Pack_mass.get()), float(Max_V.get()), float(Min_V.get()), float(Discharging_power.get()), float(Charging_power.get())]
 
@@ -87,7 +91,7 @@ def calculate():
     desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
     slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
     
-    EV_metrics = [EV_mass.get(), EV_drag.get(), EV_front_area.get(), EV_r_r.get()]
+    car_data = [EV_mass.get(), EV_drag.get(), EV_front_area.get(), EV_r_r.get()]
     EV_slider_values = [float(EV_mass_slider.get()), float(EV_drag_slider.get()), round(float(EV_front_area_slider.get()), 4), float(EV_r_r_slider.get())]
     # slider_values = [range_slider.get(), total_energy_slider.get(), Pack_mass_slider.get(), Max_V_slider.get(), Min_V_slider.get(), Discharging_power_slider.get(), Charging_power_slider.get()]
 
@@ -120,6 +124,8 @@ def calculate():
             except: 
                 print("non number entered in charging")
         
+    # Accounts for the mass of the dc-dc converters in the worst case scenario where one of the batteries has to provide all the power 
+    # since the power is added from each battery so probably only need to account for half the power in the dc-dc converter
     if desired_EV_characteristics[5] > desired_EV_characteristics[6]:
         print(desired_EV_characteristics[2])
         desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[5]/37500) + 1) * 0.2
@@ -127,20 +133,20 @@ def calculate():
     else:
         desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[6]/37500) + 1) * 0.2
 
-    for i in range(len(EV_metrics)):
-        if EV_metrics[i] == "":
-            EV_metrics[i] = EV_slider_values[i]
+    for i in range(len(car_data)):
+        if car_data[i] == "":
+            car_data[i] = EV_slider_values[i]
         elif i == 0: 
-            try: EV_metrics[i] = float(EV_mass.get())
+            try: car_data[i] = float(EV_mass.get())
             except: print("non number entered in EV mass")
         elif i == 1: 
-            try: EV_metrics[i] = float(EV_drag.get())
+            try: car_data[i] = float(EV_drag.get())
             except: print("non number entered in EV drag")
         elif i == 2: 
-            try: EV_metrics[i] = float(EV_front_area.get())
+            try: car_data[i] = float(EV_front_area.get())
             except: print("non number entered in EV frontal area")
         elif i == 3: 
-            try: EV_metrics[i] = float(EV_r_r.get())
+            try: car_data[i] = float(EV_r_r.get())
             except: 
                 print("non number entered in EV rolling resistance")
 
@@ -155,19 +161,19 @@ def calculate():
 
     # req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power = Values_From_Boxes(float(range.get()), float(total_energy.get()), float(Discharging_power.get()), float(Charging_power.get()), float(Max_V.get()), float(Min_V.get()), float(Pack_mass.get()), req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)
     print(f"Reqired values: {desired_EV_characteristics}")
-    print(f"EV values{EV_metrics}")
+    print(f"EV values{car_data}")
     
     global successful_combinations, successful_combinations_both, count_successful_combinations_2_bat, count_successful_combinations_1_bat, successful_combinations_1_bat, successful_combinations_2_bat
 
     # for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
-    #     Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, EV_metrics):
+    #     Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
 
     #     result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
     #     app.update()
 
     try:
         for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
-        Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
+        Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
             if total_checked % 1000 == 0:
                 result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
                 app.update()
@@ -213,7 +219,7 @@ def calculate():
 
         
 
-        result_label_weightings.configure(text=f"Options: {options}\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Best option using Weightings\n\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
         result_label_calculating.configure(text=f"2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
     else:
         result_label_calculating.configure(text=f"No combinations found")
@@ -243,7 +249,7 @@ def check_selected(value):
     checkbox_Only_2_batteries.deselect()
     checkbox_both_batteries.deselect()
 
-    print(value)
+    # print(value)
 
     if value == 2:
         checkbox_Only_1_battery.select()
@@ -275,7 +281,6 @@ def check_selected(value):
 def Only_2_bat():
     global successful_combinations
     successful_combinations = successful_combinations_2_bat
-    print(successful_combinations)
     on_desired_slider_release()
 
 def Both_bat():
@@ -295,33 +300,53 @@ def non_number_message():
 
 def update_total_energy_label(value):
     total_energy_label.configure(text=f"Energy: {float(value):.0f}")
+    # total_energy.delete(0, 'end')
+    # total_energy.insert(0, f"{float(value):.0f}")
 
 def update_Pack_mass_label(value):
     Pack_mass_label.configure(text=f"Pack Mass: {float(value):.0f}")
+    # Pack_mass.delete(0, 'end')
+    # Pack_mass.insert(0, f"{float(value):.0f}")
 
 def update_Max_V_label(value):
     Max_V_label.configure(text=f"Maximum Voltage: {float(value):.0f}")
+    # Max_V.delete(0, 'end')
+    # Max_V.insert(0, f"{float(value):.0f}")
 
 def update_Min_V_label(value):
     Min_V_label.configure(text=f"Minimum Voltage: {float(value):.0f}")
+    # Min_V.delete(0, 'end')
+    # Min_V.insert(0, f"{float(value):.0f}")
 
 def update_Discharging_power_label(value):
     Discharging_power_label.configure(text=f"Discharging Power: {float(value):.0f}")
+    # Discharging_power.delete(0, 'end')
+    # Discharging_power.insert(0, f"{float(value):.0f}")
 
 def update_Charging_power_label(value):
     Charging_power_label.configure(text=f"Charging Power: {float(value):.0f}")
+    # Charging_power.delete(0, 'end')
+    # Charging_power.insert(0, f"{float(value):.0f}")
 
 def update_EV_mass_label(value):
     EV_mass_label.configure(text=f"EV Mass: {float(value):.0f}")
+    # EV_mass.delete(0, 'end')
+    # EV_mass.insert(0, f"{float(value):.0f}")
 
 def update_EV_drag_label(value):
     EV_drag_label.configure(text=f"EV Drag Coefficient: {float(value):.2f}")
+    # EV_drag.delete(0, 'end')
+    # EV_drag.insert(0, f"{float(value):.2f}")
 
 def update_EV_front_area_label(value):
     EV_front_area_label.configure(text=f"EV Frontal Area: {float(value):.2f}")
+    # EV_front_area.delete(0, 'end')  
+    # EV_front_area.insert(0, f"{float(value):.2f}")
 
 def update_EV_r_r_label(value):
     EV_r_r_label.configure(text=f"EV Rolling Resistance: {float(value):.3f}")
+    # EV_r_r.delete(0, 'end')
+    # EV_r_r.insert(0, f"{float(value):.3f}")
 
 # Weighting sliders
 default_weighting = [1.15, 0.9, 0, 0, 0]
@@ -372,11 +397,19 @@ def update_numbers_for_desired_sliders():
     min_discharging_power_row = min(successful_combinations, key=lambda x: x[7])
     min_mass_row = min(successful_combinations, key=lambda x: x[8])
     max_mass_row = max(successful_combinations, key=lambda x: x[8])
+    # print(f"Max range row: {max_range_row}")
+    # print(f"Min range row: {min_range_row}")
+    # print(f"Max charging time row: {max_charging_time_row}")
+    # print(f"Min charging time row: {min_charging_time_row}")
+    # print(f"Max discharging power row: {max_discharging_power_row}")
+    # print(f"Min discharging power row: {min_discharging_power_row}") 
+    # print(f"Max mass row: {max_mass_row}")
+    # print(f"Min mass row: {min_mass_row}")
 
     global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass
     desired_range = min_range_row[10]
     desired_min_charging_time = max_charging_time_row[11]
-    desired_max_discharging_power = min_discharging_power_row[7]
+    desired_max_discharging_power = min_discharging_power_row[7]/1000
     desired_max_mass = max_mass_row[8]
 
 
@@ -577,9 +610,9 @@ def on_weighting_slider_release(event=None):
     weighting = [Range_weighting, min_charging_time_weighting, max_discharge_power_weighting, min_pack_mass_weighting, min_charge_power_weighting]
     best_weighted_normaliesed = Compare_Best_Combination_changed_weightings(successful_combinations, weighting)
     if has_calculate_been_pressed == 1:
-        result_label_weightings.configure(text=f"Options: {len(successful_combinations)}\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Best option using Weightings\n\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
     else:
-        result_label_weightings.configure(text="Press Calculate to see results \n \n \n \n \n ")
+        result_label_weightings.configure(text="Press Calculate to see results \n \n \n \n \n \n")
 
 def reset_weightings():
     Range_weighting_slider.set(default_weighting[0])
@@ -649,10 +682,12 @@ def reset_inputs():
     update_Charging_power_label(input_charging_power)
 
 def on_desired_slider_release(event=None):
+    global matching_rows
+
     desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
     print(desired_values, has_calculate_been_pressed)
     if has_calculate_been_pressed == 1:
-        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power/1000 and row[8] <= desired_max_mass]
+        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
         if matching_rows:
             
             # print(f"Matching rows length: {len(matching_rows)}")
@@ -666,6 +701,37 @@ def on_desired_slider_release(event=None):
 
 
     # result_label.configure(text=f"Range: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+
+
+def excel_output():
+    if len(matching_rows) == 1:
+        
+        data = {'Range': [matching_rows[0][10]], 'Charging time(10-80%)': [matching_rows[0][11]], 'Max discharging power': [matching_rows[0][7]], 'Min pack mass': [matching_rows[0][8]],\
+                'Max charging power': [matching_rows[0][9]], 'Battery 1': [matching_rows[0][0]], 'Series Bat 1': [matching_rows[0][1]], 'Parallel bat 1': [matching_rows[0][2]], \
+                'Battery 2': [matching_rows[0][3]], 'Series bat 2': [matching_rows[0][4]], 'Parallel bat 2': [matching_rows[0][5]], 'EV mass without pack': [car_data[0]], \
+                'EV drag coefficient': [car_data[1]], 'EV frontal area': [car_data[2]], 'EV rolling resistance': [car_data[3]], \
+                ' Total energy': [desired_EV_characteristics[1]], 'Pack mass': [desired_EV_characteristics[2]], 'Max V': [desired_EV_characteristics[3]], 'Min V': [desired_EV_characteristics[4]], \
+                'Discharging power': [desired_EV_characteristics[5]], 'Charging power': [desired_EV_characteristics[6]]}
+        df = pd.DataFrame(data)
+
+        file_path = 'Battery database from open source_CellDatabase_v6.xlsx'
+        sheet_name = 'Outputted Data'
+
+        # Load existing workbook
+        try:
+            existing_book = load_workbook(file_path)
+            with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+                # Position the new data at the bottom of the existing sheet
+                start_row = existing_book[sheet_name].max_row
+                df.to_excel(writer, sheet_name=sheet_name, startrow=start_row, startcol=1, index=False, header=False)
+        except FileNotFoundError:
+            # If file doesn't exist, create a new file
+            with pd.ExcelWriter(file_path, engine='openpyxl', mode='w') as writer:
+                df.to_excel(writer, sheet_name=sheet_name, index=False)
+        print("Printed to file")
+    else:
+        print("Please select a single option to output")
+    
 
 
 # Total Energy
@@ -684,7 +750,7 @@ total_energy, total_energy_slider, total_energy_label = Make_Entry_boxes_and_sli
 Pack_mass, Pack_mass_slider, Pack_mass_label = Make_Entry_boxes_and_sliders(app, f"Pack Mass: ", input_max_mass_pack, 3, 2, 1000, 500, 0, 200, "Pack Mass (kg)")
 Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum Voltage: ", input_max_V, 5, 2, 1000, 500, 0, 200, "Maximum Voltage (V)")
 Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage: ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
-Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power: ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
+Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power: ", input_discharging_power, 9, 2, 400000, 200000, 0, 400, "Peak Discharging Power (W)")
 Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power: ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
 
 # EV_range_slider.configure(command=update_range_label)
@@ -699,7 +765,7 @@ Charging_power_slider.configure(command=update_Charging_power_label)
 # EV metrics
 
 # Needed to stop the sliders from going off the ends
-EV_mass = ctk.CTkEntry(app, placeholder_text="EV Mass (kg)", width=160, height=28)
+EV_mass = ctk.CTkEntry(app, placeholder_text="EV Mass Without Pack (kg)", width=160, height=28)
 EV_mass.grid(row= 1, column= 3, padx=10, pady=10)
 EV_mass_slider = ctk.CTkSlider(app, from_= 0, to=5000, number_of_steps=2500)
 EV_mass_slider.grid(row= 1, column=4, padx=10, pady=10)
@@ -709,7 +775,7 @@ EV_mass_label = ctk.CTkLabel(app, text=car_data[0])
 EV_mass_label.grid(row= 2, column=4)
 
 # EV mass without battery pack
-EV_mass, EV_mass_slider, EV_mass_label = Make_Entry_boxes_and_sliders(app, f"EV Mass: ", car_data[0], 1, 4, 5000, 2500, 0, 1000, "EV Mass (kg)")
+EV_mass, EV_mass_slider, EV_mass_label = Make_Entry_boxes_and_sliders(app, f"EV Mass: ", car_data[0], 1, 4, 5000, 2500, 0, 1000, "EV Mass Without Pack (kg)")
 EV_mass_slider.configure(command=update_EV_mass_label)
 # EV drag coefficient
 EV_drag, EV_drag_slider, EV_drag_label = Make_Entry_boxes_and_sliders(app, f"EV Drag Coefficient: ", car_data[1], 3, 4, 1, 0.5, 0, 100, "EV Drag Coefficient")
@@ -763,7 +829,7 @@ min_pack_mass_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_rel
 # Desired_min_charging_time_slider.configure(command=update_desired_min_charging_time_label)
 # Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
-Max_range_row = max(successful_combinations, key=lambda x: x[10])
+max_range_row = max(successful_combinations, key=lambda x: x[10])
 min_charging_time_row = min(successful_combinations, key=lambda x: x[11])
 max_charging_time_row = max(successful_combinations, key=lambda x: x[11])
 max_discharging_power_row = max(successful_combinations, key=lambda x: x[7])
@@ -774,14 +840,14 @@ Min_mass_row = min(successful_combinations, key=lambda x: x[8])
 def make_desired_sliders():
     global Desired_range_slider, Desired_range_label, Desired_min_charging_time_slider, Desired_min_charging_time_label, Desired_max_discharge_power_slider, Desired_max_discharge_power_label, Desired_max_mass_slider, Desired_max_mass_label, result_label_desired_values
 
-    Desired_range_slider = ctk.CTkSlider(app, from_= 0, to=round(math.floor(Max_range_row[10]), -1), number_of_steps=round(math.floor(Max_range_row[10]), -1)/20)
+    Desired_range_slider = ctk.CTkSlider(app, from_= 0, to=round(math.floor(max_range_row[10]), -1), number_of_steps=round(math.floor(max_range_row[10]), -1)/20)
     Desired_range_slider.grid(row= 1, column=7, padx=10, pady=10)
-    Desired_range_slider.set(Max_range_row[10])
+    Desired_range_slider.set(max_range_row[10])
     # total_energy_slider.configure(command=update_total_energy_label)
     Desired_range_label = ctk.CTkLabel(app, text=default_weighting[0])
     Desired_range_label.grid(row= 2, column=7)
 
-    Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range: ", 0, 1, 7, math.ceil(Max_range_row[10]/10)*10, (math.ceil(Max_range_row[10]/10)*10)/2, 0, (math.ceil(Max_range_row[10]/10)*10)/5)
+    Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range: ", 0, 1, 7, math.ceil(max_range_row[10]/10)*10, (math.ceil(max_range_row[10]/10)*10)/2, 0, (math.ceil(max_range_row[10]/10)*10)/5)
     Desired_range_slider.configure(command=update_desired_range_label)
     Desired_range_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
@@ -844,10 +910,14 @@ reset_weightings_button.grid(row= 11, column= 6, padx=0, pady=0)
 reset_inputs_button = ctk.CTkButton(app, text="Reset Inputs", command=reset_inputs)
 reset_inputs_button.grid(row= 11, column= 3, padx=0, pady=0)
 
+# Button to output data to excel
+excel_output_button = ctk.CTkButton(app, text="Excel Output", command=excel_output)
+excel_output_button.grid(row= 12, column= 3, padx=0, pady=0)
+
 
 
 # Create a label to display the result
-result_label_weightings = ctk.CTkLabel(app, text=" \n \n \n \n \n ")
+result_label_weightings = ctk.CTkLabel(app, text=" \n \n \n \n \n \n")
 result_label_weightings.grid(row= 12, column= 6, padx=0, pady=5, rowspan=3) 
 
 # Create a label to display the result of desired sliders
@@ -870,7 +940,8 @@ desired_EV_outputs_title_label.grid(row=0, column= 7, columnspan=1, padx=5, pady
 Weightings_sliders_title_label = ctk.CTkLabel(app, text="Please adjust sliders for desired\nweightings")
 Weightings_sliders_title_label.grid(row=0, column= 6, columnspan=1, padx=5, pady=10)
 
-
+excel_output_button_label = ctk.CTkLabel(app, text="Press to output data to excel")
+excel_output_button_label.grid(row=13, column= 3, columnspan=1, padx=5, pady=10)
 
 
 

@@ -72,8 +72,9 @@ def on_click(event, ax, range_data_all, charging_data_all, click_label: ctk.CTkL
         # Find closest point
         distances = np.sqrt((range_data_all - event.xdata) ** 2 + (charging_data_all - event.ydata) ** 2)
         index = np.argmin(distances)
-        print(f"Index: {index}\nRange: {range_data_all[index]:.1f}, Charging Time: {charging_data_all[index]:.1f}\nRange clicked: {event.xdata:.1f}, Charging Time clicked: {event.ydata:.1f}")
-        click_label.configure(text=f"Range: {range_data_all[index]:.1f}\nCharging Time: {charging_data_all[index]:.1f}")
+        # print(f"Index: {index}\nRange: {range_data_all[index]:.1f}, Charging Time: {charging_data_all[index]:.1f}\nRange clicked: {event.xdata:.1f}, Charging Time clicked: {event.ydata:.1f}")
+        if distances[index] < 20:
+            click_label.configure(text=f"Range: {range_data_all[index]:.1f}\nCharging Time: {charging_data_all[index]:.1f}")
 
 
 
