@@ -151,14 +151,14 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     #                                                                                 req_min_V, req_max_mass_pack, req_charging_power)
     end_time_2_bat = time.time()
     for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed):
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power):
         yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
         
     print(f"total checked: {total_checked}")
     end_time_2_bat_test = time.time()  # End timer
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed)
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power)
 
 
     for i in range(len(successful_combinations_1_bat)):
@@ -174,12 +174,10 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     elapsed_time_1_bat = end_time_after_finding_combinations - end_time_2_bat_test
     elapsed_time_test = end_time_2_bat_test - end_time_2_bat
     elapsed_time_2_bat = end_time_2_bat - start_time
-    total_time = end_time_after_finding_combinations - start_time
 
-    # print(f"Elapsed time 1 bat: {elapsed_time_1_bat:.6f} seconds")
-    # print(f"Elapsed time 2 bat: {elapsed_time_2_bat:.6f} seconds")
-    # print(f"Elapsed time 2 bat test: {elapsed_time_test:.6f} seconds")
-    print(f"Total time: {total_time:.2f} seconds")
+    print(f"Elapsed time 1 bat: {elapsed_time_1_bat:.6f} seconds")
+    print(f"Elapsed time 2 bat: {elapsed_time_2_bat:.6f} seconds")
+    print(f"Elapsed time 2 bat test: {elapsed_time_test:.6f} seconds")
             
     print(f"2-Batteries count: {count_successful_combinations_2_bat}, 1-Battery count: {count_successful_combinations_1_bat}")
 

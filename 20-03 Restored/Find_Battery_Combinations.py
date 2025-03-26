@@ -2,7 +2,7 @@
 from One_Chem_Comparison import One_Chem_Comparison
 
 
-def Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power, batteries_to_be_removed):
+def Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power):
     
     successful_batteries = []
     single_bat_success = 0
@@ -31,8 +31,6 @@ def Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, re
             break
         else:
             battery_1_index += 1
-            if battery_1_index in batteries_to_be_removed:
-                battery_1_index += 1
 
 
 
@@ -113,7 +111,7 @@ def Find_Two_Battery_Options(battery_data, req_energy, req_discharging_power, re
 
 
 
-def Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power, batteries_to_be_removed):
+def Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power):
     
     battery_1_index = 1
     battery_2_index = 2
@@ -176,13 +174,9 @@ def Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_powe
             break
         elif battery_2_index == 333:
             battery_1_index += 1
-            if battery_1_index in batteries_to_be_removed:
-                battery_1_index += 1
             battery_2_index = battery_1_index + 1
         else:
             battery_2_index += 1
-            if battery_2_index in batteries_to_be_removed:
-                battery_2_index += 1
      
 
     return successful_combinations, count_successful_combinations, total_checked

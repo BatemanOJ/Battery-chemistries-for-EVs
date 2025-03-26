@@ -167,7 +167,7 @@ def calculate():
 
     try:
         for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
-        Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
+        Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
             if total_checked % 1000 == 0:
                 result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
                 app.update()
