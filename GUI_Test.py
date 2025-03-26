@@ -707,9 +707,9 @@ def excel_output():
     if len(matching_rows) == 1:
         
         data = {'Range': [matching_rows[0][10]], 'Charging time(10-80%)': [matching_rows[0][11]], 'Max discharging power': [matching_rows[0][7]], 'Min pack mass': [matching_rows[0][8]],\
-                'Max charging power': [matching_rows[0][9]], 'Battery 1': [matching_rows[0][0]], 'Series Bat 1': [matching_rows[0][1]], 'Parallel bat 1': [matching_rows[0][2]], \
-                'Battery 2': [matching_rows[0][3]], 'Series bat 2': [matching_rows[0][4]], 'Parallel bat 2': [matching_rows[0][5]], 'EV mass without pack': [car_data[0]], \
-                'EV drag coefficient': [car_data[1]], 'EV frontal area': [car_data[2]], 'EV rolling resistance': [car_data[3]], \
+                'Max charging power': [matching_rows[0][9]], 'Energy': [matching_rows[0][6]], 'Battery 1': [matching_rows[0][0]], 'Series Bat 1': [matching_rows[0][1]], 'Parallel bat 1': [matching_rows[0][2]], \
+                'Battery 2': [matching_rows[0][3]], 'Series bat 2': [matching_rows[0][4]], 'Parallel bat 2': [matching_rows[0][5]], \
+                'EV mass without pack': [car_data[0]], 'EV drag coefficient': [car_data[1]], 'EV frontal area': [car_data[2]], 'EV rolling resistance': [car_data[3]], \
                 ' Total energy': [desired_EV_characteristics[1]], 'Pack mass': [desired_EV_characteristics[2]], 'Max V': [desired_EV_characteristics[3]], 'Min V': [desired_EV_characteristics[4]], \
                 'Discharging power': [desired_EV_characteristics[5]], 'Charging power': [desired_EV_characteristics[6]]}
         df = pd.DataFrame(data)
@@ -830,6 +830,7 @@ min_pack_mass_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_rel
 # Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
 max_range_row = max(successful_combinations, key=lambda x: x[10])
+print(max_range_row)
 min_charging_time_row = min(successful_combinations, key=lambda x: x[11])
 max_charging_time_row = max(successful_combinations, key=lambda x: x[11])
 max_discharging_power_row = max(successful_combinations, key=lambda x: x[7])
