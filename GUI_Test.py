@@ -279,7 +279,6 @@ def check_selected(value):
 def Only_2_bat():
     global successful_combinations
     successful_combinations = successful_combinations_2_bat
-    print(successful_combinations)
     on_desired_slider_release()
 
 def Both_bat():
@@ -380,7 +379,7 @@ def update_numbers_for_desired_sliders():
     global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass
     desired_range = min_range_row[10]
     desired_min_charging_time = max_charging_time_row[11]
-    desired_max_discharging_power = min_discharging_power_row[7]
+    desired_max_discharging_power = min_discharging_power_row[7]/1000
     desired_max_mass = max_mass_row[8]
 
 
@@ -656,7 +655,7 @@ def on_desired_slider_release(event=None):
     desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
     print(desired_values, has_calculate_been_pressed)
     if has_calculate_been_pressed == 1:
-        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power/1000 and row[8] <= desired_max_mass]
+        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
         if matching_rows:
             
             # print(f"Matching rows length: {len(matching_rows)}")
@@ -724,7 +723,7 @@ def make_desired_sliders():
 def excel_output():
 
     desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
-    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power/1000 and row[8] <= desired_max_mass]
+    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
 
     desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
     slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
