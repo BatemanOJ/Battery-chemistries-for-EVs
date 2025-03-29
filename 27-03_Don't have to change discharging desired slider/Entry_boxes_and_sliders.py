@@ -61,33 +61,6 @@ def Make_Sliders(app, default_name, default_input, row, column, max, middle, min
 
     return Charging_power_slider, Charging_power_label
 
-def Make_Sliders_1_sf(app, default_name, default_input, row, column, max, middle, min, num_steps):
-
-    # Charging slider label
-    Charging_power_min_label = ctk.CTkLabel(app, text=f"\n\n\n      {min}", font=("Helvetica", 10))
-    Charging_power_min_label.grid(row=row, column=column, padx=0, pady=0, sticky="w")
-    Charging_power_mid_label = ctk.CTkLabel(app, text=f"\n\n\n{middle}", font=("Helvetica", 10))
-    Charging_power_mid_label.grid(row=row, column=column)
-    Charging_power_max_label = ctk.CTkLabel(app, text=f"\n\n\n{max}      ", font=("Helvetica", 10))
-    Charging_power_max_label.grid(row=row, column=column, sticky="e")
-
-
-    Charging_power_slider = ctk.CTkSlider(app, from_=min, to=max, number_of_steps=num_steps, state="disabled")
-    Charging_power_slider.grid(row= row, column=column, padx=0, pady=0)
-    print(f"default_input: {default_input}")
-    Charging_power_slider.set(1)
-    Charging_power_label = ctk.CTkLabel(app, text= f"{default_name}{default_input:.1f}")
-    Charging_power_label.grid(row= row+1, column=column)
-
-    Charging_power_min_dash_label = ctk.CTkLabel(app, text="       |", font=("Helvetica", 7))
-    Charging_power_min_dash_label.grid(row=row, column=column, padx=0, pady=0, sticky="w")
-    Charging_power_mid_dash_label = ctk.CTkLabel(app, text="|", font=("Helvetica", 7))
-    Charging_power_mid_dash_label.grid(row=row, column=column)
-    Charging_power_max_dash_label = ctk.CTkLabel(app, text="|       ", font=("Helvetica", 7))
-    Charging_power_max_dash_label.grid(row=row, column=column, padx=0, pady=0, sticky="e")
-
-    return Charging_power_slider, Charging_power_label
-
 def Make_Sliders_desired_values(app, default_name, default_input, row, column, max, middle, min, num_steps):
 
     # Charging slider label

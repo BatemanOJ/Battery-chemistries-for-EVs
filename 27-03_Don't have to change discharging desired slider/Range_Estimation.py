@@ -130,14 +130,3 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
 
     return Range_1
           
-
-
- # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508 (97% efficiency)
- # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
- # car_data = [1486, 0.28, 2.33, 0.015, 0] # Nissan Leaf         Actual: 169(excel)/135, Calculated: 179 Using 2 chems: 310
-#  car_data = [1830, 0.23, 2.268, 0.015, 0] # Tesla model 3 2022 long range AWD     Actual: 576, Calculated: 572
- # car_data = [1928, 0.23, 2.27, 0.015, 0] # Tesla Model 3 2021 long range AWD
- # car_data = [2584, 0.29, 2.3, 0.015, 0] # Polestar 3              Actual: 482, Calculated: 532
- # car_data = [2695, 0.27, 2.47, 0.015, 0] # Audi 
- 
- # range_test = Range_Estimation_for_Batteries_Test(WLTP_data, car_data, 0, 0, 0)

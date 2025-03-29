@@ -7,7 +7,7 @@ from openpyxl import load_workbook
 
 from Main_Code_2 import Calculate_Possible_Combinations
 from Set_Default_Values import Set_Default_Values_For_GUI, Values_From_Boxes
-from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, Make_Sliders_desired_values, Make_Sliders_1_sf
+from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, Make_Sliders_desired_values
 from Compare_Best_Combinations import Compare_Best_Combination_changed_weightings
 from Scatter_plots import plot_scatter
 
@@ -209,11 +209,9 @@ def calculate():
         max_discharge_power_weighting_slider.configure(state="normal")
         min_pack_mass_weighting_slider.configure(state="normal")
         Desired_range_slider.configure(state="normal")
-        Desired_km_per_min_slider.configure(state="normal")
-        # Desired_min_charging_time_slider.configure(state="normal")
+        Desired_min_charging_time_slider.configure(state="normal")
         Desired_max_discharge_power_slider.configure(state="normal")
         Desired_max_mass_slider.configure(state="normal")
-        # min_charging_time_slider.configure(state="normal")
 
         
 
@@ -367,7 +365,7 @@ def update_min_pack_mass_weighting_label(value):
 
 
 def update_numbers_for_desired_sliders():
-    global min_range_row, max_range_row, min_charging_time_row, max_charging_time_row, max_discharging_power_row, min_discharging_power_row, max_mass_row, min_mass_row, list_km_per_min
+    global min_range_row, max_range_row, min_charging_time_row, max_charging_time_row, max_discharging_power_row, min_discharging_power_row, max_mass_row, min_mass_row
     
     max_range_row = max(successful_combinations, key=lambda x: x[10])
     min_range_row = min(successful_combinations, key=lambda x: x[10])
@@ -378,20 +376,11 @@ def update_numbers_for_desired_sliders():
     min_mass_row = min(successful_combinations, key=lambda x: x[8])
     max_mass_row = max(successful_combinations, key=lambda x: x[8])
 
-    list_km_per_min = []
-    for i in range(0, len(successful_combinations)):
-        km_per_min = (0.8*successful_combinations[i][10] - 0.1*successful_combinations[i][10])/successful_combinations[i][11]
-        list_km_per_min.append(km_per_min)
-    # print(f"km_per_min: {list_km_per_min}")
-
-
-    global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass, desired_km_per_min
+    global desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass
     desired_range = min_range_row[10]
     desired_min_charging_time = max_charging_time_row[11]
     desired_max_discharging_power = min_discharging_power_row[7]/1000
     desired_max_mass = max_mass_row[8]
-    desired_km_per_min = min(list_km_per_min)
-    print(desired_km_per_min)
 
 
 
@@ -400,15 +389,10 @@ def update_desired_range_label(value):
     global desired_range
     desired_range = value
 
-# def update_desired_min_charging_time_label(value):
-#     Desired_min_charging_time_label.configure(text=f"Charging Time (10-80%) (mins): {float(value):.0f}")
-#     global desired_min_charging_time
-#     desired_min_charging_time = value
-
-def update_desired_km_per_min_label(value):
-    Desired_km_per_min_label.configure(text=f"Charging km/min (10-80%): {float(value):.1f}")
-    global desired_km_per_min
-    desired_km_per_min = value
+def update_desired_min_charging_time_label(value):
+    Desired_min_charging_time_label.configure(text=f"Charging Time (10-80%) (mins): {float(value):.0f}")
+    global desired_min_charging_time
+    desired_min_charging_time = value
 
 def update_desired_max_discharge_power_label(value):
     Desired_max_discharge_power_label.configure(text=f"Max Discharge Power (kW): {float(value):.0f}")
@@ -668,16 +652,16 @@ def reset_inputs():
     update_Charging_power_label(input_charging_power)
 
 def on_desired_slider_release(event=None):
-    desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
+    desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
     print(desired_values, has_calculate_been_pressed)
     if has_calculate_been_pressed == 1:
-        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
         if matching_rows:
             
             # print(f"Matching rows length: {len(matching_rows)}")
             # print(matching_rows[0], matching_rows[len(matching_rows)-2], matching_rows[len(matching_rows)-1])
 
-            result_label_desired_values.configure(text=f"Options: {len(matching_rows)} \nRange: {matching_rows[0][10]:.2f}(km) \nCharging km/min (10-80%): {((0.8*matching_rows[0][10] - 0.1*matching_rows[0][10])/matching_rows[0][11]):.1f}(km/min)\nMax discharging power: {(matching_rows[0][7]/1000):.0f}(kW) \nMin pack mass: {matching_rows[0][8]:.0f}(kg) \nMax charging power: {(matching_rows[0][9]/1000):.0f}(kW)")
+            result_label_desired_values.configure(text=f"Options: {len(matching_rows)} \nRange: {matching_rows[0][10]:.2f}(km) \nCharging time(10-80%): {matching_rows[0][11]:.0f}(mins) \nMax discharging power: {(matching_rows[0][7]/1000):.0f}(kW) \nMin pack mass: {matching_rows[0][8]:.0f}(kg) \nMax charging power: {(matching_rows[0][9]/1000):.0f}(kW)")
         else:
             result_label_desired_values.configure(text=f"No matching rows found")
     else:
@@ -691,17 +675,11 @@ min_charging_time_row = min(successful_combinations, key=lambda x: x[11])
 max_charging_time_row = max(successful_combinations, key=lambda x: x[11])
 max_discharging_power_row = max(successful_combinations, key=lambda x: x[7])
 Min_mass_row = min(successful_combinations, key=lambda x: x[8])
-# desired_km_per_min = min(list_km_per_min)
 
-list_km_per_min = []
-for i in range(0, len(successful_combinations)):
-    km_per_min = (0.8*successful_combinations[i][10] - 0.1*successful_combinations[i][10])/successful_combinations[i][11]
-    list_km_per_min.append(km_per_min)
-# print(f"km_per_min: {list_km_per_min}")
 
 
 def make_desired_sliders():
-    global Desired_range_slider, Desired_range_label, Desired_km_per_min_slider, Desired_km_per_min_label, Desired_max_discharge_power_slider, Desired_max_discharge_power_label, Desired_max_mass_slider, Desired_max_mass_label, result_label_desired_values,Desired_min_charging_time_slider, Desired_min_charging_time_label, min_charging_time_slider
+    global Desired_range_slider, Desired_range_label, Desired_min_charging_time_slider, Desired_min_charging_time_label, Desired_max_discharge_power_slider, Desired_max_discharge_power_label, Desired_max_mass_slider, Desired_max_mass_label, result_label_desired_values
 
     Desired_range_slider = ctk.CTkSlider(app, from_= 0, to=round(math.floor(max_range_row[10]), -1), number_of_steps=round(math.floor(max_range_row[10]), -1)/20)
     Desired_range_slider.grid(row= 1, column=7, padx=10, pady=10)
@@ -714,17 +692,9 @@ def make_desired_sliders():
     Desired_range_slider.configure(command=update_desired_range_label)
     Desired_range_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
-    # Desired_min_charging_time_slider, Desired_min_charging_time_label = Make_Sliders_desired_values(app, "Charging Time (10-80%) (mins): ", max_charging_time_row[11], 3, 7, (math.ceil(max_charging_time_row[11]/10)*10), (math.ceil(max_charging_time_row[11]/10)*10)/2, 0, (math.ceil(max_charging_time_row[11]/10)*10))
-    # Desired_min_charging_time_slider.configure(command=update_desired_min_charging_time_label)
-    # Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
-    # print(f"min list: {math.floor(min(list_km_per_min)*10)/10}")
-    # print(f"max list: {math.ceil(max(list_km_per_min))}")
-
-    Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging km/min (10-80%): ", (math.floor(min(list_km_per_min)*10)/10), 3, 7, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))/2, 0, math.ceil(max(list_km_per_min))*10)
-    Desired_km_per_min_slider.configure(command=update_desired_km_per_min_label)
-    Desired_km_per_min_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
-    # Desired_km_per_min_slider.set((math.floor(min(list_km_per_min)*10)/10))
-    # desired_km_per_min = (0.8*max_range_row[10] - 0.1*max_range_row[10])/min_charging_time_row[11]
+    Desired_min_charging_time_slider, Desired_min_charging_time_label = Make_Sliders_desired_values(app, "Charging Time (10-80%) (mins): ", max_charging_time_row[11], 3, 7, (math.ceil(max_charging_time_row[11]/10)*10), (math.ceil(max_charging_time_row[11]/10)*10)/2, 0, (math.ceil(max_charging_time_row[11]/10)*10))
+    Desired_min_charging_time_slider.configure(command=update_desired_min_charging_time_label)
+    Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
 
     if math.ceil((max_discharging_power_row[7]/1000)/10)*10 == math.ceil((min_discharging_power_row[7]/1000)/10)*10:
         Desired_max_discharge_power_slider, Desired_max_discharge_power_label = Make_Sliders_desired_values(app, "Max Discharge Power (kW): ", (min_discharging_power_row[7]/1000), 5, 7, (max_discharging_power_row[7]/1000)+1, (max_discharging_power_row[7]/1000), (max_discharging_power_row[7]/1000)-1, 2)

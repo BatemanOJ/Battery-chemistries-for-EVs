@@ -163,7 +163,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     end_time_2_bat_test = time.time()  # End timer
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power)
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed)
 
 
     for i in range(len(successful_combinations_1_bat)):
