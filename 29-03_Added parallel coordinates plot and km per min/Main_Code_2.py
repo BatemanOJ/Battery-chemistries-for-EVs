@@ -104,7 +104,7 @@ req_charging_power = 50000
 
 
 
-def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data, max_volume):
+def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
     
     import time
     start_time = time.time()
@@ -151,19 +151,19 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
     #                                                                                 req_min_V, req_max_mass_pack, req_charging_power)
     end_time_2_bat = time.time()
     for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test_with_removed(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed, max_volume):
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power, batteries_to_be_removed):
         yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
         
     if successful_combinations == []:
         for successful_combinations, count_successful_combinations_2_bat, total_checked in Find_Two_Battery_Options_Test(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power, max_volume):
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power):
             yield successful_combinations, 0, count_successful_combinations_2_bat, 0, total_checked
         
     print(f"total checked: {total_checked}")
     end_time_2_bat_test = time.time()  # End timer
 
     successful_combinations_1_bat, count_successful_combinations_1_bat = Find_One_Battery_Options(battery_data, req_energy, req_discharging_power, req_max_V, \
-                                                                                    req_min_V, req_max_mass_pack, req_charging_power, max_volume)
+                                                                                    req_min_V, req_max_mass_pack, req_charging_power)
 
 
     for i in range(len(successful_combinations_1_bat)):

@@ -32,7 +32,6 @@ input_min_V = 240
 input_max_mass_battery = 185.5
 input_max_mass_pack = 315
 input_charging_power = 50000
-max_volume = 0.485
 
 # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
 # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
@@ -58,7 +57,7 @@ car_data = [1486, 0.28, 2.32, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 
 try:
     for successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat, total_checked in \
-    Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data, max_volume):
+    Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data):
         if total_checked == 10:
             print(f"Total checked: {total_checked}")
 
@@ -155,7 +154,6 @@ def calculate():
     req_min_V = desired_EV_characteristics[4]
     req_discharging_power = desired_EV_characteristics[5]
     req_charging_power = desired_EV_characteristics[6]
-    max_volume = 0.485
 
 
     # req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power = Values_From_Boxes(float(range.get()), float(total_energy.get()), float(Discharging_power.get()), float(Charging_power.get()), float(Max_V.get()), float(Min_V.get()), float(Pack_mass.get()), req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)
@@ -172,7 +170,7 @@ def calculate():
 
     try:
         for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
-        Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data, max_volume):
+        Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data):
             if total_checked % 1000 == 0:
                 result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
                 app.update()
