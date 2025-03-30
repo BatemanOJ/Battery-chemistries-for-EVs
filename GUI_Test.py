@@ -10,6 +10,7 @@ from Set_Default_Values import Set_Default_Values_For_GUI, Values_From_Boxes
 from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, Make_Sliders_desired_values, Make_Sliders_1_sf
 from Compare_Best_Combinations import Compare_Best_Combination_changed_weightings
 from Scatter_plots import plot_scatter
+from Create_parallel_coordinates_plot import create_parallel_coordinates_plot
 
 # Create the main window
 app = ctk.CTk()
@@ -940,6 +941,9 @@ calc_button.grid(row= 11, column= 4, padx=10, pady=0)
 # Scatter plot button
 plot_button = ctk.CTkButton(app, text="Generate Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
 plot_button.grid(row=24, column=3, pady=0, padx=0)
+
+parallel_coordinates_plot_button = ctk.CTkButton(app, text="Generate Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations))
+parallel_coordinates_plot_button.grid(row=24, column=4, pady=0, padx=0)
 
 # Button to reset the weightings
 reset_weightings_button = ctk.CTkButton(app, text="Reset Weightings", command=reset_weightings)
