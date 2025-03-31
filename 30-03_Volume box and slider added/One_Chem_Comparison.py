@@ -208,8 +208,8 @@ def One_Chem_Comparison(battery_1, req_energy, peak_power_req, max_pack_V_allowe
     # print(f"Charging Power: {peak_charge_power_req, peak_charge_power_generated}")
     success = 1
 
-    # print(f"Volume 6: {total_volume}, battery: {battery_1[27]}, {battery_1[28]}, {battery_1[29]}")
-    # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1}, Mass: {pack_mass}, max volume: {max_volume}, volume check: {volume_check}")
+    print(f"Volume 6: {total_volume}, battery: {battery_1[27]}, {battery_1[28]}, {battery_1[29]}")
+    print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1}, Mass: {pack_mass}, max volume: {max_volume}, volume check: {volume_check}")
 
     return success, no_battery_1_series, no_battery_1_parallel, energy, peak_power_generated, pack_mass, peak_charge_power_generated
 

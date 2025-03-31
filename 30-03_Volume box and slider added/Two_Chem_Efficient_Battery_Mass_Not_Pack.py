@@ -11,7 +11,6 @@ import pandas as pd
 from Find_Power_Dense_Battery import Find_Power_Dense_Battery_Efficient
 from Check_Constraints import Check_Mass_Battery_Only, Check_Max_V, Check_Min_V, Check_energy
 from Pack_Volume_Calculator import volume_calculator
-from check_power import check_power
 
 battery_data = {}
 
@@ -24,7 +23,6 @@ battery_data = {f"battery_{i}_index": battery_database.iloc[i].tolist() for i in
 
 def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, peak_power_req, max_pack_V_allowed, min_pack_V_allowed, max_mass, peak_charge_power_req, max_volume):
 
-    original_max_mass = max_mass
     # Battery 1 is the energy dense one and battery 2 is the power dense one
     battery_1, battery_2, battery_1_Wh, battery_2_Wh = Find_Power_Dense_Battery_Efficient(battery_1, battery_2)
 
@@ -56,17 +54,9 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
             pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((no_battery_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
             # print(f"Mass reducer, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {mass}")
     
-    
+    total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1, 1, no_battery_2, 1, max_volume)
     # print(f"Total volume 2: {total_volume}")
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}, Volume: {max_volume}")
-    # if battery_1[27] == 275:
-        # print(f"Pack mass: {pack_mass}, Maximum: {max_mass}")
-
-    max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1, 1, no_battery_2, 1, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
-    total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1, 1, no_battery_2, 1, max_volume)
-
-    # if battery_1[27] == 275:
-    #     print(f"Maximum mass: {max_mass}")
 
     while req_energy > energy and pack_mass <= max_mass and volume_check == 1:
 
@@ -91,7 +81,6 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         energy = math.floor(no_battery_1 * battery_1_Wh + no_battery_2 * battery_2_Wh)
         pack_mass = (((no_battery_1 * (battery_1[21]/1000))/battery_1[40]) * 100) + (((no_battery_2 * (battery_2[21]/1000))/battery_2[40]) * 100)
         total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1, 1, no_battery_2, 1, max_volume)
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1, 1, no_battery_2, 1, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
         # print(f"Mass: {mass}, energy: {energy}")
 
         if pack_mass> max_mass:
@@ -154,7 +143,6 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
                 check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
                 check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
                 check_energy, energy = Check_energy(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_energy)
-                max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
                 total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
                 # print(f"Reduce series Check: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, energy: {energy, req_energy}")
 
@@ -175,7 +163,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
             no_battery_2_series = no_battery_2_series - math.floor(no_battery_2_series/(1+no_battery_2_parallel))
             no_battery_2_parallel += 1
 
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
+
         check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         while check_mass == 0:
             if no_battery_1_parallel > no_battery_2_parallel and \
@@ -195,13 +183,11 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
                 # print(f"Fail. pack_mass, voltage or energy over limit{pack_mass, max_pack_V, min_pack_V, energy}, Check Cap: {check_energy}")
                 return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, energy, 0, pack_mass, 0, 0
             
-            max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
             check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
             
         check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
         check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
         check_energy, energy = Check_energy(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_energy)
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
         check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
 
@@ -213,7 +199,6 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
             return success, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, energy, 0, pack_mass, 0, 0
     
     # print(f"Voltage Check Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}")
-    max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
     total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
     # print(f"Total volume 4: {total_volume}")
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}, Volume: {max_volume}")
@@ -249,7 +234,6 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
                            no_battery_2_series * no_battery_2_parallel * battery_2_peak_power 
         # mass = no_battery_1 * (battery_1[21]/1000) + no_battery_2 * (battery_2[21]/1000)
 
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
         check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
         check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
@@ -268,7 +252,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
     
     battery_1_peak_charge_power = battery_1[16] * battery_1[23]
     battery_2_peak_charge_power = battery_2[16] * battery_2[23]
-    max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
+
     total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
     # print(f"Total volume 5: {total_volume}")
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}, Volume: {max_volume}")
@@ -304,8 +288,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
 
         # print(f"Mass: {max_mass, mass}, max-V: {max_pack_V_allowed, max_pack_V}, min-V: {min_pack_V_allowed, min_pack_V}, energy: {energy}, Check Cap: {check_energy}, \
             #   Peak Power: {peak_power_req, peak_power_generated} Peak Charge Power: {peak_charge_power_req, peak_charge_power_generated}")
-        
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
+
         check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
         check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
@@ -321,13 +304,13 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
 
         # print(f"Power: {peak_power_req, peak_power_generated}, Batteries: {no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel}, Mass: {mass}")
 
-    max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
     check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
     check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
     check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
     check_energy, energy = Check_energy(battery_1_Wh, battery_2_Wh, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, req_energy)
     total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
 
+    total_volume, volume_check = volume_calculator(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, max_volume)
     # print(f"Total volume 6: {total_volume}")
     # print(f"Pre-tests, energy: {energy} Batteries: {no_battery_1, no_battery_2}, Mass: {pack_mass}, Volume: {max_volume}")
 
@@ -339,8 +322,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
     # print(f"Charging Power 3{peak_charge_power_req, peak_charge_power_generated}")
 
     # Function to check if another battery can be added
-    def can_add_battery(max_volume):
-        max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
+    def can_add_battery():
         check_mass, _ = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
         check_max_V, _ = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
         check_min_V, _ = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)
@@ -357,7 +339,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         no_battery_1_series += 1
         # print(f"1 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
         # tests += 1
-        if not can_add_battery(max_volume):
+        if not can_add_battery():
             no_battery_1_series -= 1
             # print(f"1 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
             # fails += 1
@@ -367,7 +349,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         no_battery_2_series += 1
         # print(f"2 series add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
         # tests += 1
-        if not can_add_battery(max_volume):
+        if not can_add_battery():
             no_battery_2_series -= 1
             # print(f"2 series sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
             # fails += 1
@@ -378,7 +360,7 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         no_battery_1_parallel += 1
         # print(f"1 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
         # tests += 1
-        if not can_add_battery(max_volume):
+        if not can_add_battery():
             no_battery_1_parallel -= 1
             # print(f"1 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
             # fails += 1
@@ -388,13 +370,12 @@ def Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_1, battery_2, req_energy, p
         no_battery_2_parallel += 1
         # print(f"2 parallel add {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
         # tests += 1
-        if not can_add_battery(max_volume):
+        if not can_add_battery():
             no_battery_2_parallel -= 1
             # print(f"2 parallel sub {no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel}")
             # fails += 1
             break  # Stop adding when constraint is exceeded
 
-    max_mass, max_volume = check_power(battery_1, battery_2, no_battery_1_series, no_battery_1_parallel, no_battery_2_series, no_battery_2_parallel, original_max_mass, max_volume, peak_power_req, peak_charge_power_req)
     check_mass, pack_mass = Check_Mass_Battery_Only(battery_1, battery_2, no_battery_1_series, no_battery_2_series, no_battery_1_parallel, no_battery_2_parallel, max_mass)
     check_max_V, max_pack_V = Check_Max_V(battery_1[15], battery_2[15], no_battery_1_series, no_battery_2_series, max_pack_V_allowed)
     check_min_V, min_pack_V = Check_Min_V(battery_1[17], battery_2[17], no_battery_1_series, no_battery_2_series, min_pack_V_allowed)

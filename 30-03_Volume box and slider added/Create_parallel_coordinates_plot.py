@@ -25,10 +25,10 @@ def create_parallel_coordinates_plot(successful_combinations):
     print(f"km_per_min: {km_per_min}")
 
     df = pd.DataFrame({
-        'Range (km)': Range,
-        'Charging speed (km/min)': km_per_min, 
-        'Max discharging power (W)': Max_discharging_power,
-        'Min pack mass (kg)': Min_pack_mass
+        'Range': Range,
+        'Charging km/min (10-80%)': km_per_min, 
+        'Max discharging power': Max_discharging_power,
+        'Min pack mass': Min_pack_mass
     })
 
     df_test = pd.DataFrame({
@@ -40,8 +40,8 @@ def create_parallel_coordinates_plot(successful_combinations):
     })
 
     fig = px.parallel_coordinates(df, 
-                              dimensions=['Range (km)', 'Charging speed (km/min)', 'Max discharging power (W)', 'Min pack mass (kg)'],
-                              color='Range (km)',
+                              dimensions=['Range (km)', 'Charging speed (km/min)', 'Max discharging power (W)', 'Min pack mass(kg)'],
+                              color='Range',
                               color_continuous_scale=px.colors.diverging.Tealrose)
     fig.show()
     fig_test = px.parallel_coordinates(df_test, 

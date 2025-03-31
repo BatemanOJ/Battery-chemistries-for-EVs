@@ -126,14 +126,12 @@ def calculate():
             try: desired_EV_characteristics[i] = float(Volume.get())
             except: print("non number entered in volume")
         
-    # if desired_EV_characteristics[5] > desired_EV_characteristics[6]:
-    #     # print(desired_EV_characteristics[2])
-    #     desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[5]/48200))
-    #     # print(desired_EV_characteristics[2])
-    #     desired_EV_characteristics[7] = desired_EV_characteristics[7] - (math.ceil(desired_EV_characteristics[5]/48200)) * 0.00018333
-    # else:
-    #     desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[6]/48200))
-    #     desired_EV_characteristics[7] = desired_EV_characteristics[7] - (math.ceil(desired_EV_characteristics[5]/48200)) * 0.00018333
+    if desired_EV_characteristics[5] > desired_EV_characteristics[6]:
+        print(desired_EV_characteristics[2])
+        desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[5]/37500) + 1) * 0.2
+        print(desired_EV_characteristics[2])
+    else:
+        desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[6]/37500) + 1) * 0.2
 
     for i in range(len(car_data)):
         if car_data[i] == "":
