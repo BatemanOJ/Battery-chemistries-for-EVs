@@ -32,7 +32,7 @@ input_min_V = 240
 input_max_mass_battery = 185.5
 input_max_mass_pack = 315
 input_charging_power = 50000
-max_volume = 0.485
+input_max_volume = 0.485
 
 # car_data = [3100, 0.3, 3.38, 0.015, 0] # Rivian R1T             Actual: 505, Calculated: 508
 # car_data = [1748, 0.29, 2.37, 0.015, 0] # Kia Niro EV         Actual: 384, Calculated: 405
@@ -58,7 +58,7 @@ car_data = [1486, 0.28, 2.32, 0.015, 0] # Nissan Leaf         Actual: 169(excel)
 
 try:
     for successful_combinations, best_weighted_normaliesed, count_successful_combinations, count_successful_combinations_1_bat, total_checked in \
-    Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data, max_volume):
+    Calculate_Possible_Combinations(input_energy, input_discharging_power, input_max_V, input_min_V, input_max_mass_pack, input_charging_power, car_data, input_max_volume):
         if total_checked == 10:
             print(f"Total checked: {total_checked}")
 
@@ -88,8 +88,8 @@ def calculate():
 
     # desired_EV_characteristics = [EV_range.get(), total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
     # slider_values = [float(EV_range_slider.get()), float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
-    desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
-    slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
+    desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get(), Volume.get()]
+    slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get()), float(Volume_slider.get())]
     
     car_data = [EV_mass.get(), EV_drag.get(), EV_front_area.get(), EV_r_r.get()]
     EV_slider_values = [float(EV_mass_slider.get()), float(EV_drag_slider.get()), round(float(EV_front_area_slider.get()), 4), float(EV_r_r_slider.get())]
@@ -121,8 +121,10 @@ def calculate():
             except: print("non number entered in discharging")
         elif i == 6: 
             try: desired_EV_characteristics[i] = float(Charging_power.get())
-            except: 
-                print("non number entered in charging")
+            except: print("non number entered in charging")
+        elif i == 7: 
+            try: desired_EV_characteristics[i] = float(Volume.get())
+            except: print("non number entered in volume")
         
     if desired_EV_characteristics[5] > desired_EV_characteristics[6]:
         print(desired_EV_characteristics[2])
@@ -155,7 +157,7 @@ def calculate():
     req_min_V = desired_EV_characteristics[4]
     req_discharging_power = desired_EV_characteristics[5]
     req_charging_power = desired_EV_characteristics[6]
-    max_volume = 0.485
+    max_volume = desired_EV_characteristics[7]
 
 
     # req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power = Values_From_Boxes(float(range.get()), float(total_energy.get()), float(Discharging_power.get()), float(Charging_power.get()), float(Max_V.get()), float(Min_V.get()), float(Pack_mass.get()), req_range, req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power)
@@ -302,34 +304,37 @@ def non_number_message():
     app.after(2000, message_label.destroy)
 
 def update_total_energy_label(value):
-    total_energy_label.configure(text=f"Energy: {float(value):.0f}")
+    total_energy_label.configure(text=f"Energy (Wh): {float(value):.0f}")
 
 def update_Pack_mass_label(value):
-    Pack_mass_label.configure(text=f"Pack Mass: {float(value):.0f}")
+    Pack_mass_label.configure(text=f"Pack Mass (kg): {float(value):.0f}")
 
 def update_Max_V_label(value):
-    Max_V_label.configure(text=f"Maximum Voltage: {float(value):.0f}")
+    Max_V_label.configure(text=f"Maximum Voltage (V): {float(value):.0f}")
 
 def update_Min_V_label(value):
-    Min_V_label.configure(text=f"Minimum Voltage: {float(value):.0f}")
+    Min_V_label.configure(text=f"Minimum Voltage (V): {float(value):.0f}")
 
 def update_Discharging_power_label(value):
-    Discharging_power_label.configure(text=f"Discharging Power: {float(value):.0f}")
+    Discharging_power_label.configure(text=f"Discharging Power (W): {float(value):.0f}")
 
 def update_Charging_power_label(value):
-    Charging_power_label.configure(text=f"Charging Power: {float(value):.0f}")
+    Charging_power_label.configure(text=f"Charging Power (W): {float(value):.0f}")
+
+def update_Volume_label(value):
+    Volume_label.configure(text=f"Volume (m³): {float(value):.3f}")
 
 def update_EV_mass_label(value):
-    EV_mass_label.configure(text=f"EV Mass: {float(value):.0f}")
+    EV_mass_label.configure(text=f"EV Mass (kg): {float(value):.0f}")
 
 def update_EV_drag_label(value):
     EV_drag_label.configure(text=f"EV Drag Coefficient: {float(value):.2f}")
 
 def update_EV_front_area_label(value):
-    EV_front_area_label.configure(text=f"EV Frontal Area: {float(value):.2f}")
+    EV_front_area_label.configure(text=f"EV Frontal Area (m²): {float(value):.2f}")
 
 def update_EV_r_r_label(value):
-    EV_r_r_label.configure(text=f"EV Rolling Resistance: {float(value):.3f}")
+    EV_r_r_label.configure(text=f"EV Rolling Resistance (N): {float(value):.3f}")
 
 # Weighting sliders
 default_weighting = [1.15, 0.9, 0, 0, 0]
@@ -409,7 +414,7 @@ def update_desired_range_label(value):
 #     desired_min_charging_time = value
 
 def update_desired_km_per_min_label(value):
-    Desired_km_per_min_label.configure(text=f"Charging km/min (10-80%): {float(value):.1f}")
+    Desired_km_per_min_label.configure(text=f"Charging speed (km/min): {float(value):.1f}")
     global desired_km_per_min
     desired_km_per_min = value
 
@@ -636,27 +641,28 @@ def reset_inputs():
     Min_V_slider.set(input_min_V)
     Discharging_power_slider.set(input_discharging_power)
     Charging_power_slider.set(input_charging_power)
+    Volume_slider.set(input_max_volume)
 
     total_energy.delete(0, 'end')
-    total_energy.configure(placeholder_text="Total Energy")
+    total_energy.configure(placeholder_text="Total Energy (Wh)")
     Pack_mass.delete(0, 'end')
-    Pack_mass.configure(placeholder_text="Pack Mass")
+    Pack_mass.configure(placeholder_text="Pack Mass (kg)")
     Max_V.delete(0, 'end') 
-    Max_V.configure(placeholder_text="Maximum Voltage")
+    Max_V.configure(placeholder_text="Maximum Voltage (V)")
     Min_V.delete(0, 'end')
-    Min_V.configure(placeholder_text="Minimum Voltage")
+    Min_V.configure(placeholder_text="Minimum Voltage (V)")
     Discharging_power.delete(0, 'end')
-    Discharging_power.configure(placeholder_text="Discharging Power")
+    Discharging_power.configure(placeholder_text="Peak Discharging Power (W)")
     Charging_power.delete(0, 'end')
-    Charging_power.configure(placeholder_text="Charging Power")
+    Charging_power.configure(placeholder_text="Peak Charging Power (W)")
     EV_mass.delete(0, 'end')
-    EV_mass.configure(placeholder_text="EV Mass")
+    EV_mass.configure(placeholder_text="EV Mass (kg)")
     EV_drag.delete(0, 'end')
     EV_drag.configure(placeholder_text="EV Drag Coefficient")
     EV_front_area.delete(0, 'end')
-    EV_front_area.configure(placeholder_text="EV Frontal Area")
+    EV_front_area.configure(placeholder_text="EV Frontal Area (m²)")
     EV_r_r.delete(0, 'end')
-    EV_r_r.configure(placeholder_text="EV Rolling Resistance")
+    EV_r_r.configure(placeholder_text="EV Rolling Resistance (N)")
 
     update_EV_mass_label(car_data[0])
     update_EV_drag_label(car_data[1])
@@ -680,7 +686,7 @@ def on_desired_slider_release(event=None):
             # print(f"Matching rows length: {len(matching_rows)}")
             # print(matching_rows[0], matching_rows[len(matching_rows)-2], matching_rows[len(matching_rows)-1])
 
-            result_label_desired_values.configure(text=f"Options: {len(matching_rows)} \nRange: {matching_rows[0][10]:.2f}(km) \nCharging km/min (10-80%): {((0.8*matching_rows[0][10] - 0.1*matching_rows[0][10])/matching_rows[0][11]):.1f}(km/min)\nMax discharging power: {(matching_rows[0][7]/1000):.0f}(kW) \nMin pack mass: {matching_rows[0][8]:.0f}(kg) \nMax charging power: {(matching_rows[0][9]/1000):.0f}(kW)")
+            result_label_desired_values.configure(text=f"Options: {len(matching_rows)} \nRange: {matching_rows[0][10]:.2f}(km) \nCharging speed: {((0.8*matching_rows[0][10] - 0.1*matching_rows[0][10])/matching_rows[0][11]):.1f}(km/min)\nMax discharging power: {(matching_rows[0][7]/1000):.0f}(kW) \nMin pack mass: {matching_rows[0][8]:.0f}(kg) \nMax charging power: {(matching_rows[0][9]/1000):.0f}(kW)")
         else:
             result_label_desired_values.configure(text=f"No matching rows found")
     else:
@@ -723,7 +729,7 @@ def make_desired_sliders():
     # print(f"min list: {math.floor(min(list_km_per_min)*10)/10}")
     # print(f"max list: {math.ceil(max(list_km_per_min))}")
 
-    Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging km/min (10-80%): ", (math.floor(min(list_km_per_min)*10)/10), 3, 7, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))/2, 0, math.ceil(max(list_km_per_min))*10)
+    Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", (math.floor(min(list_km_per_min)*10)/10), 3, 7, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))/2, 0, math.ceil(max(list_km_per_min))*10)
     Desired_km_per_min_slider.configure(command=update_desired_km_per_min_label)
     Desired_km_per_min_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
     # Desired_km_per_min_slider.set((math.floor(min(list_km_per_min)*10)/10))
@@ -837,12 +843,13 @@ total_energy_label.grid(row= 4, column=2)
 
 # Desired EV characteristics
 # EV_range, EV_range_slider, EV_range_label = Make_Entry_boxes_and_sliders(app, f"Range: ", input_range, 1, 2, 1000, 500, 0, 200, "Range (km)")
-total_energy, total_energy_slider, total_energy_label = Make_Entry_boxes_and_sliders(app, f"Energy: ", input_energy, 1, 2, 150000, 75000, 0, 150, "Total Energy (Wh)")
-Pack_mass, Pack_mass_slider, Pack_mass_label = Make_Entry_boxes_and_sliders(app, f"Pack Mass: ", input_max_mass_pack, 3, 2, 1000, 500, 0, 200, "Pack Mass (kg)")
-Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum Voltage: ", input_max_V, 5, 2, 1000, 500, 0, 200, "Maximum Voltage (V)")
-Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage: ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
-Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power: ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
-Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power: ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
+total_energy, total_energy_slider, total_energy_label = Make_Entry_boxes_and_sliders(app, f"Energy (Wh): ", input_energy, 1, 2, 150000, 75000, 0, 150, "Total Energy (Wh)")
+Pack_mass, Pack_mass_slider, Pack_mass_label = Make_Entry_boxes_and_sliders(app, f"Pack Mass (kg): ", input_max_mass_pack, 3, 2, 1000, 500, 0, 200, "Pack Mass (kg)")
+Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum Voltage (V): ", input_max_V, 5, 2, 1000, 500, 0, 200, "Maximum Voltage (V)")
+Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage (V): ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
+Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power (W): ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
+Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power (W): ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
+Volume, Volume_slider, Volume_label = Make_Entry_boxes_and_sliders(app, f"Volume (m³): ", input_max_volume, 13, 2, 2, 1, 0, 400, "Volume (m³)")
 
 # EV_range_slider.configure(command=update_range_label)
 total_energy_slider.configure(command=update_total_energy_label)
@@ -851,6 +858,7 @@ Max_V_slider.configure(command=update_Max_V_label)
 Min_V_slider.configure(command=update_Min_V_label)
 Discharging_power_slider.configure(command=update_Discharging_power_label)
 Charging_power_slider.configure(command=update_Charging_power_label)
+Volume_slider.configure(command=update_Volume_label)
 
 
 # EV metrics
@@ -866,16 +874,16 @@ EV_mass_label = ctk.CTkLabel(app, text=car_data[0])
 EV_mass_label.grid(row= 2, column=4)
 
 # EV mass without battery pack
-EV_mass, EV_mass_slider, EV_mass_label = Make_Entry_boxes_and_sliders(app, f"EV Mass: ", car_data[0], 1, 4, 5000, 2500, 0, 1000, "EV Mass (kg)")
+EV_mass, EV_mass_slider, EV_mass_label = Make_Entry_boxes_and_sliders(app, f"EV Mass (kg): ", car_data[0], 1, 4, 5000, 2500, 0, 1000, "EV Mass (kg)")
 EV_mass_slider.configure(command=update_EV_mass_label)
 # EV drag coefficient
 EV_drag, EV_drag_slider, EV_drag_label = Make_Entry_boxes_and_sliders(app, f"EV Drag Coefficient: ", car_data[1], 3, 4, 1, 0.5, 0, 100, "EV Drag Coefficient")
 EV_drag_slider.configure(command=update_EV_drag_label)
 # EV frontal area
-EV_front_area, EV_front_area_slider, EV_front_area_label = Make_Entry_boxes_and_sliders(app, f"EV Frontal Area: ", car_data[2], 5, 4, 5, 2.5, 0, 200, "EV Frontal Area (m²)")
+EV_front_area, EV_front_area_slider, EV_front_area_label = Make_Entry_boxes_and_sliders(app, f"EV Frontal Area (m²): ", car_data[2], 5, 4, 5, 2.5, 0, 200, "EV Frontal Area (m²)")
 EV_front_area_slider.configure(command=update_EV_front_area_label)
 # EV rolling resistance
-EV_r_r, EV_r_r_slider, EV_r_r_label = Make_Entry_boxes_and_sliders(app, f"EV Rolling Resistance: ", car_data[3], 7, 4, 0.04, 0.015, 0, 40, "EV Rolling Resistance (N)")
+EV_r_r, EV_r_r_slider, EV_r_r_label = Make_Entry_boxes_and_sliders(app, f"EV Rolling Resistance (N): ", car_data[3], 7, 4, 0.04, 0.015, 0, 40, "EV Rolling Resistance (N)")
 EV_r_r_slider.configure(command=update_EV_r_r_label)
 
 
@@ -899,7 +907,7 @@ Min_charging_time_weighting_slider, Min_charging_time_weighting_label = Make_Sli
 Min_charging_time_weighting_slider.configure(command=update_min_charging_time_weighting_label)
 Min_charging_time_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
-max_discharge_power_weighting_slider, max_discharge_power_weighting_label = Make_Sliders(app, "Max Discharge Power Weighting: ", default_weighting[2], 5, 6, 3, 1.5, 0, 60)
+max_discharge_power_weighting_slider, max_discharge_power_weighting_label = Make_Sliders(app, "Peak Discharge Power Weighting: ", default_weighting[2], 5, 6, 3, 1.5, 0, 60)
 max_discharge_power_weighting_slider.configure(command=update_max_discharge_power_weighting_label)
 max_discharge_power_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
