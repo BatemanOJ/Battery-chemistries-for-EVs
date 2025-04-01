@@ -7,22 +7,36 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 def plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat):
     
-    if successful_combinations_1_bat != [] or successful_combinations_2_bat != []:
-        range_data_bat_1 = [row[10] for row in successful_combinations_1_bat]
-        charging_data_bat_1 = [row[11] for row in successful_combinations_1_bat]
-        range_data_bat_2 = [row[10] for row in successful_combinations_2_bat]
-        charging_data_bat_2 = [row[11] for row in successful_combinations_2_bat]
-
+    if successful_combinations_1_bat != 0 or successful_combinations_2_bat != 0:
+        
         plot_window = ctk.CTkToplevel()
         plot_window.title("Range vs. Minimum Charging Time")
         plot_window.geometry("750x600")
-        
+
         # Create a new figure
         fig, ax = plt.subplots()
+
+        # print(f"successful_combinations_1_bat: {successful_combinations_1_bat}, successful_combinations_2_bat: {successful_combinations_2_bat}")
+
+        
+
+        if successful_combinations_2_bat != 0:
+            range_data_bat_2 = [row[10] for row in successful_combinations_2_bat]
+            charging_data_bat_2 = [row[11] for row in successful_combinations_2_bat]
+            ax.scatter(range_data_bat_2, charging_data_bat_2, color='blue', label='2 Battery Options')
+            range_data_all = range_data_bat_2
+            charging_data_all = charging_data_bat_2
+
+
+        if successful_combinations_1_bat != 0:
+            range_data_bat_1 = [row[10] for row in successful_combinations_1_bat]
+            charging_data_bat_1 = [row[11] for row in successful_combinations_1_bat]
+            ax.scatter(range_data_bat_1, charging_data_bat_1, color='red', label='1 Battery Options')
+            
+            range_data_all.extend(range_data_bat_1)
+            charging_data_all.extend(charging_data_bat_1)
         # print(len(range_data_bat_1), len(charging_data_bat_1))
         # print(len(range_data_bat_2), len(charging_data_bat_2))
-        ax.scatter(range_data_bat_1, charging_data_bat_1, color='red', label='1 Battery Options')
-        ax.scatter(range_data_bat_2, charging_data_bat_2, color='blue', label='2 Battery Options')
         
         ax.set_title("Range vs. Minimum Charging Time")
         ax.set_xlabel("Range (km)")
@@ -34,28 +48,6 @@ def plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat):
         canvas.draw()
         canvas.get_tk_widget().pack(pady=10, padx=10)
 
-        # range_data_all = np.array(range_data_bat_2 + range_data_bat_1)
-        range_data_all = range_data_bat_2
-        range_data_all.extend(range_data_bat_1)
-        charging_data_all = charging_data_bat_2
-        charging_data_all.extend(charging_data_bat_1)
-        # range_data_all = np.array(range_data_all)
-        print(f"range_data_all: {len(range_data_all)}, charging_data_all: {len(charging_data_all)}")
-
-        index_max_range_row = range_data_all.index(max(range_data_all))
-        print(f"max range row: {charging_data_all[index_max_range_row]}")
-
-        index_min_charging_row = charging_data_all.index(min(charging_data_all))
-        print(f"max range row: {range_data_all[index_min_charging_row]}")
-
-        
-        
-        print(range_data_all[-2:])
-        print(range_data_bat_1)
-
-        # Hover label
-        hover_label = ctk.CTkLabel(plot_window, text="")
-        hover_label.pack(pady=10)
         # Click label
         click_label = ctk.CTkLabel(plot_window, text="Click on a point to see details")
         click_label.pack(pady=10)

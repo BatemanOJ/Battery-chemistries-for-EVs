@@ -211,7 +211,7 @@ def Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V
 
             # print(f"Battery number series parallel {successful_combinations[i][0], successful_combinations[i][1], successful_combinations[i][2], successful_combinations[i][3], successful_combinations[i][4], successful_combinations[i][5]}")
 
-            Range= Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
+            Range = Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
 
             successful_combinations[i].append(Range)
 

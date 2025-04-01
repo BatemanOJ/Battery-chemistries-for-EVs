@@ -11,6 +11,10 @@ from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, 
 from Compare_Best_Combinations import Compare_Best_Combination_changed_weightings
 from Scatter_plots import plot_scatter
 from Create_parallel_coordinates_plot import create_parallel_coordinates_plot
+from Get_battery_and_WLTP_data import Get_battery_and_WLTP_data
+from Range_Estimation import Range_Estimation_for_Each_Battery
+from Power_estimation_for_each_battery import Power_Estimation_for_Each_Battery
+
 
 # Create the main window
 app = ctk.CTk()
@@ -528,9 +532,24 @@ def update_sliders(event=None):
                     update_Charging_power_label(value_Charging_power)
             except:
                 print("non number entered in Charging_power")
-                print(EV_mass.get())
                 non_number_message()
         
+        value_volume_empty = Volume.get()
+        if value_volume_empty == "":
+            Volume_slider.set(input_max_volume)  # Assuming input_Charging_power is a predefined default value
+            update_Volume_label(input_max_volume)
+        else:
+            try:
+                value_Volume = float(Volume.get())
+                if Volume_slider._from_ <= value_Volume <= Volume_slider._to:
+                    Volume_slider.set(value_Volume)
+                    update_Volume_label(value_Volume)
+                else:
+                    update_Volume_label(value_Volume)
+            except:
+                print("non number entered in Volume")
+                non_number_message()
+
         value_EV_mass = EV_mass.get()
         if value_EV_mass == "":
             EV_mass_slider.set(car_data[0])
@@ -793,11 +812,6 @@ def excel_output():
             try: desired_EV_characteristics[i] = float(Charging_power.get())
             except: 
                 print("non number entered in charging")
-        
-    if desired_EV_characteristics[5] > desired_EV_characteristics[6]:
-        desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[5]/37500) + 1) * 0.2
-    else:
-        desired_EV_characteristics[2] = desired_EV_characteristics[2] - (math.ceil(desired_EV_characteristics[6]/37500) + 1) * 0.2
 
      
     if len(matching_rows) == 1:
@@ -831,6 +845,224 @@ def excel_output():
         print("Please select a single option to output")
     
     # existing_book.save(file_path)
+    
+
+def BMS_option():
+
+    battery_data, WLTP_data = Get_battery_and_WLTP_data()
+
+    # desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
+    # print(desired_values, has_calculate_been_pressed)
+    # if has_calculate_been_pressed == 1:
+    #     matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+    #     if matching_rows:
+    
+    desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
+    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+
+    desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
+    slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
+
+    for i in range(len(desired_EV_characteristics)):
+        # print(desired_EV_characteristics[i])
+
+        if desired_EV_characteristics[i] == "":
+            desired_EV_characteristics[i] = slider_values[i]
+        elif i == 1: 
+            try: desired_EV_characteristics[i] = float(total_energy.get())
+            except: print("non number entered in energy")
+        elif i == 2: 
+            try: desired_EV_characteristics[i] = float(Pack_mass.get())
+            except: print("non number entered in pack mass")
+        elif i == 3: 
+            try: desired_EV_characteristics[i] = float(Max_V.get())
+            except: print("non number entered in max voltage")
+        elif i == 4: 
+            try: desired_EV_characteristics[i] = float(Min_V.get())
+            except: print("non number entered in min voltage")
+        elif i == 5: 
+            try: desired_EV_characteristics[i] = float(Discharging_power.get())
+            except: print("non number entered in discharging")
+        elif i == 6: 
+            try: desired_EV_characteristics[i] = float(Charging_power.get())
+            except: 
+                print("non number entered in charging")
+
+     
+    if len(matching_rows) == 1:
+
+        # Gemini_possible = 0
+        # PHEV_possible = 0
+        # Both_possible = 0
+        # HEV_possible = 0
+        
+        battery_data_series_parallel = [matching_rows[0][1], matching_rows[0][2], matching_rows[0][4], matching_rows[0][5]]
+        battery_data_series_parallel_battery_1 = [matching_rows[0][1], matching_rows[0][2], 0, 0]
+        battery_data_series_parallel_battery_2 = [matching_rows[0][4], matching_rows[0][5], 0, 0]
+
+        battery_1 = battery_data[f"battery_{matching_rows[0][0]}_index"]
+        battery_2 = battery_data[f"battery_{matching_rows[0][3]}_index"]
+
+        # print(f"matching_rows: {matching_rows}")
+        # print(f"battery_data_series_parallel: {battery_data_series_parallel}")
+        # print(f"battery_1: {battery_1}")
+        # print(f"battery_2: {battery_2}")
+
+        Range_battery_1, Range_battery_2 = Range_Estimation_for_Each_Battery(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2)
+        total_range = Range_battery_1 + Range_battery_2
+        # print(f"Range 1: {Range_battery_1}, Range 2: {Range_battery_2}")
+        Power_battery_1, Power_battery_2 = Power_Estimation_for_Each_Battery(battery_data_series_parallel, battery_1, battery_2)
+        # print(f"Power 1: {Power_battery_1}, Power 2: {Power_battery_2}")
+
+        
+        if battery_1[10] == 'not defined':
+            battery_1_cycles = 1750
+        else:
+            battery_1_cycles = battery_1[10]
+        if battery_2[10] == 'not defined':
+            battery_2_cycles = 1750
+        else:
+            battery_2_cycles = battery_2[10]
+
+        try: req_power = float(Discharging_power.get())
+        except: req_power = float(Discharging_power_slider.get())
+
+        Gemini_1 = 0
+        Gemini_2 = 0
+        PHEV_1 = 0
+        PHEV_2 = 0
+        HEV_1 = 0
+        HEV_2 = 0
+        Both = 0
+
+
+        # Check options
+        if (battery_1_cycles < 400 and Range_battery_2 > 82.86 and Power_battery_2 > req_power and battery_2_cycles > 1500):
+            Gemini_1 = 1 # Gemini has to be used to protect the battery
+        if (battery_2_cycles < 400 and Range_battery_1 > 82.86 and Power_battery_1 > req_power and battery_1_cycles > 1500):
+            Gemini_2 = 1
+
+        
+        if (Range_battery_1 < 48 and total_range > 150 and Power_battery_2 < req_power):
+                HEV_1 = 1 # Have to use HEV because the range is so low on one battery that it can only be used as a power boost
+        if (Range_battery_2 < 48 and total_range > 150 and Power_battery_1 < req_power):
+                HEV_2 = 1
+        if (Range_battery_1 < (total_range*0.25) and Power_battery_2 < req_power and total_range < 150):
+                HEV_1 = 1 # Have to use HEV because the range is so low on one battery that it can only be used as a power boost
+        if (Range_battery_2 < (total_range*0.25) and Power_battery_1 < req_power and total_range < 150):
+                HEV_2 = 1
+        
+        if (Power_battery_1 > req_power and Power_battery_2 < req_power and Range_battery_1 > 48.28 and Range_battery_2 > Range_battery_1):
+            PHEV_1 = 1
+        if (Power_battery_2 > req_power and Power_battery_1 < req_power and Range_battery_2 > 48.28 and Range_battery_2 < Range_battery_1):
+            PHEV_2 = 1
+
+        if (Gemini_1 + Gemini_2 + PHEV_1 + PHEV_2 + HEV_1 + HEV_2) == 0:
+            Both = 1 
+            New_Window()
+            BMS_label.configure(text=f"The Equal BMS is the best option to use with these batteries\n")
+            print("Both possible")
+        elif(Gemini_1 + Gemini_2 + PHEV_1 + PHEV_2 + HEV_1 + HEV_2) > 1:
+            print("More than one option selected")
+        
+        else:
+            if Gemini_1 == 1:
+                New_Window()
+                BMS_label.configure(text=f"The Gemini BMS option should be used with battery 1 as the extended range battery\n"
+                                         f"and battery 2 as the everyday use battery.\n"
+                                         f"The range of everyday mode is: {Range_battery_2:.1f} km\n"
+                                         f"The range of the extending battery is: {Range_battery_1:.1f} km\n"
+                                         f"Total range: {total_range:.1f} km\n"
+                                         f"The power of everyday mode is: {Power_battery_2/1000} kW\n"
+                                         f"The cycle life of battery 1: {battery_1_cycles}\n")
+                
+                print("Gemini 1 possible")
+            if Gemini_2 == 1:   
+                New_Window()
+                BMS_label.configure(text=f"The Gemini BMS option should be used with battery 2 as the extended range battery\n"
+                                         f"and battery 1 as the everyday use battery.\n"
+                                         f"The range of everyday mode is: {Range_battery_1:.1f} km\n"
+                                         f"The range of the extending battey is: {Range_battery_2:.1f} km\n"
+                                         f"Total range: {total_range:.1f} km\n"
+                                         f"The power of everyday mode is: {Power_battery_1/1000} kW\n"
+                                         f"The cycle life of battery 2: {battery_2_cycles}\n")
+                print("Gemini 2 possible")
+            if PHEV_1 == 1:
+                New_Window()
+                BMS_label.configure(text=f"The PHEV BMS option should be used with battery 2 as the extended range battery\n"
+                                         f"and battery 1 as the everyday use battery.\n"
+                                         f"The range of everyday mode is: {Range_battery_1:.1f} km\n"
+                                         f"The range of the extending battery is: {Range_battery_2:.1f} km\n"
+                                         f"Total range: {total_range:.1f} km\n"
+                                         f"The power of everyday mode is: {Power_battery_1/1000} kW\n")
+                print("PHEV 1 possible")
+            if PHEV_2 == 1:
+                New_Window()
+                BMS_label.configure(text=f"The PHEV BMS option should be used with battery 1 as the extended range battery\n"
+                                         f"and battery 2 as the everyday use battery.\n"
+                                         f"The range of everyday mode is: {Range_battery_2:.1f} km\n"
+                                         f"The range of the extending battery is: {Range_battery_1:.1f} km\n"
+                                         f"Total range: {total_range:.1f} km\n"
+                                         f"The power of everyday mode is: {Power_battery_2/1000} kW\n")  
+                print("PHEV 2 possible")
+            if HEV_1 == 1:
+                New_Window()
+                BMS_label.configure(text=f"The HEV BMS option should be used with battery 2 as the main battery\n"
+                                         f"and battery 1 used as the extra power source for acceleration.\n"
+                                         f"The power of the main battery is: {Power_battery_2/1000} kW\n"
+                                         f"The power of the suplimentary power source battery is: {Power_battery_1/1000} kW\n"
+                                         f"The total power of the battery is: {(Power_battery_1+Power_battery_2)/1000} kW\n"
+                                         f"Total range: {total_range:.1f} km\n")
+                print("HEV 1 possible")
+            if HEV_2 == 1:
+                New_Window()
+                BMS_label.configure(text=f"The HEV BMS option should be used with battery 1 as the main battery\n"
+                                         f"and battery 2 used as the extra power source for acceleration.\n"
+                                         f"The power of the main battery is: {Power_battery_1/1000} kW\n"
+                                         f"The power of the suplimentary power source battery is: {Power_battery_2/1000} kW\n"
+                                         f"The total power of the battery is: {(Power_battery_1+Power_battery_2)/1000} kW\n"
+                                         f"Total range: {total_range:.1f} km\n")
+                print("HEV 2 possible")
+        
+        print(f"Range 1: {Range_battery_1:.1f}, Range 2: {Range_battery_2:.1f}")
+        print(f"Power 1: {Power_battery_1:.1f}, Power 2: {Power_battery_2:.1f}")
+        print(f"Cycles 1: {battery_1_cycles}, Cycles 2: {battery_2_cycles}")
+
+        # else: 
+        #     Both_possible = 0
+        #     HEV_possible = 0
+        #     Gemini_possible = 0
+        #     PHEV_possible = 0
+        
+        #     if Power_battery_1 < float(Discharging_power.get()) and Power_battery_2 < float(Discharging_power.get()):
+        #         Both_possible += 1
+        #         HEV_possible += 1
+        #         # option = [Gemini_possible, PHEV_possible, Both_possible, HEV_possible]
+            
+        #     elif Range_battery_1 < (total_range*0.65) and Range_battery_2 < (total_range*0.65):
+        #         Both_possible += 1
+        #         PHEV_possible += 1
+        #         # option = [Gemini_possible, PHEV_possible, Both_possible, HEV_possible]
+            
+
+        #     elif (Range_battery_1 > Range_battery_2 and Power_battery_1 < float(Discharging_power.get()) and Power_battery_2 > float(Discharging_power.get())) or (Range_battery_2 > Range_battery_1 and Power_battery_2 < float(Discharging_power.get()) and Power_battery_2 > float(Discharging_power.get())):
+        #         if Range_battery_1 > Range_battery_2 and 
+
+        # power of energy dense one isn't enough to power the car
+    
+    else:
+        print("Please select a single option to output")
+
+
+        
+def New_Window():
+    global BMS_window, BMS_label
+
+    BMS_window = ctk.CTkToplevel()
+    BMS_window.title("Which BMS option should be used")
+    BMS_window.geometry("450x150")
+    BMS_label = ctk.CTkLabel(BMS_window, text="", anchor="w", justify='left')
+    BMS_label.grid(padx = 10, pady = 10, row=0, column=0, sticky="w")
     
 
 # Total Energy
@@ -941,6 +1173,7 @@ Max_V.bind("<KeyRelease>", update_sliders)
 Min_V.bind("<KeyRelease>", update_sliders)
 Discharging_power.bind("<KeyRelease>", update_sliders)  
 Charging_power.bind("<KeyRelease>", update_sliders)
+Volume.bind("<KeyRelease>", update_sliders)
 EV_mass.bind("<KeyRelease>", update_sliders)
 EV_drag.bind("<KeyRelease>", update_sliders)
 EV_front_area.bind("<KeyRelease>", update_sliders)
@@ -954,7 +1187,7 @@ calc_button.grid(row= 11, column= 4, padx=10, pady=0)
 plot_button = ctk.CTkButton(app, text="Generate Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
 plot_button.grid(row=24, column=3, pady=0, padx=0)
 
-parallel_coordinates_plot_button = ctk.CTkButton(app, text="Generate Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations))
+parallel_coordinates_plot_button = ctk.CTkButton(app, text="Generate Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations, has_calculate_been_pressed))
 parallel_coordinates_plot_button.grid(row=24, column=4, pady=0, padx=0)
 
 # Button to reset the weightings
@@ -968,6 +1201,12 @@ reset_inputs_button.grid(row= 11, column= 3, padx=0, pady=0)
 # Button to output data to excel
 excel_output_button = ctk.CTkButton(app, text="Excel Output", command=excel_output)
 excel_output_button.grid(row= 12, column= 3, padx=0, pady=0)
+
+# Button to determine which BMS to use
+BMS_option_button = ctk.CTkButton(app, text="Determine BMS Option", command=BMS_option)
+BMS_option_button.grid(row= 14, column= 3, padx=0, pady=0)
+
+
 
 
 # Create a label to display the result

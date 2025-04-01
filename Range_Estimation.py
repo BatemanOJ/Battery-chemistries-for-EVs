@@ -141,3 +141,47 @@ def Range_Estimation_for_Batteries(WLTP_data, car_data, battery_data_series_para
  # car_data = [2695, 0.27, 2.47, 0.015, 0] # Audi 
  
  # range_test = Range_Estimation_for_Batteries_Test(WLTP_data, car_data, 0, 0, 0)
+
+
+def Range_Estimation_for_Each_Battery(WLTP_data, car_data, battery_data_series_parallel, battery_1, battery_2):
+
+    EV_mass = car_data[0]           # EV mass without battery
+    Cd = car_data[1]                # drag coefficient
+    Af = car_data[2]                # frontal area
+    Rr = car_data[3]                # rolling resistance
+    # Angle_of_Car = car_data[4]     # angle of road
+
+    p = 1.225 # air density (kg/m^3)
+ 
+    Power_values = []
+    Time_values = []
+
+    Pack_mass = ((battery_data_series_parallel[0] * battery_data_series_parallel[1] * (battery_1[21]/1000))/battery_1[40])*100 + \
+                ((battery_data_series_parallel[2] * battery_data_series_parallel[3] * (battery_2[21]/1000))/battery_2[40])*100
+    
+    battery_energy_1 = (battery_data_series_parallel[0] * battery_data_series_parallel[1] * battery_1[14] * battery_1[16])/1000
+    battery_energy_2 = (battery_data_series_parallel[2] * battery_data_series_parallel[3] * battery_2[14] * battery_2[16])/1000
+   
+    for i in range(1, len(WLTP_data)):
+        WLTP_row_index = i # 1 = row 3
+        #     print(f"Row 1 acc: {WLTP_data[f"WLTP_{0}_index"][4], WLTP_data[f"WLTP_{1}_index"][4], WLTP_data[f"WLTP_{2}_index"][4]}")
+        
+        
+        Power = (EV_mass + Pack_mass) * WLTP_data[f"WLTP_{WLTP_row_index}_index"][4] + (p) * Cd * Af * (WLTP_data[f"WLTP_{WLTP_row_index}_index"][3]**2) + \
+                Rr * (EV_mass + Pack_mass) * 9.81 + (EV_mass + Pack_mass) * 9.81 * math.sin(0)
+        
+        
+        time_in_loop = WLTP_data[f"WLTP_{WLTP_row_index}_index"][1]
+
+        Power_values.append(Power)
+        Time_values.append(time_in_loop)
+        
+    Energy_1 = np.trapz(Power_values, Time_values)
+
+    Energy_1_per_km = Energy_1/ (23.29023374 * 360000)
+    
+    Range_1 = ((battery_energy_1)/Energy_1_per_km) * 0.97
+    Range_2 = ((battery_energy_2)/Energy_1_per_km) * 0.97
+
+    return Range_1, Range_2
+
