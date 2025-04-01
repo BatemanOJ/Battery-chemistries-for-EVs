@@ -19,7 +19,7 @@ from Power_estimation_for_each_battery import Power_Estimation_for_Each_Battery
 # Create the main window
 app = ctk.CTk()
 app.title("Tool to analyse how two battery chemistries can be combined to meet desired EV characteristics")
-app.geometry("1350x700")
+app.geometry("1350x800")
 
 # frame = ctk.CTkFrame(app)
 # frame.grid(row=0, column=0, padx=20, pady=20)
@@ -75,7 +75,7 @@ successful_combinations_2_bat = None
 
 # Function to calculate based on slider and input values
 def calculate():
-    result_label_calculating.configure(text=f"Calculating...\n \n")
+    calculate_button_label.configure(text=f"Calculating...\n \n")
     result_label_weightings.configure(text=f" \n \n \n \n \n ")
     result_label_desired_values.configure(text=f"")
     
@@ -182,7 +182,7 @@ def calculate():
         for successful_combinations, best_weighted_normaliesed, count_successful_combinations_2_bat, count_successful_combinations_1_bat, total_checked in \
         Calculate_Possible_Combinations(req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_pack, req_charging_power, car_data, max_volume):
             if total_checked % 1000 == 0:
-                result_label_calculating.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
+                calculate_button_label.configure(text=f"Calculating...\nBattery Combinations Found: {count_successful_combinations_2_bat}\nTotal Checked: {total_checked}")
                 app.update()
 
     except StopIteration as e:
@@ -211,8 +211,24 @@ def calculate():
         clear_column(7)
         update_numbers_for_desired_sliders()
         make_desired_sliders() # Make the desired sliders using the values calculated for the max and middlie values
+        Make_weightings_sliders()
+        reset_weightings_button.grid(row= 10, column= 6, padx=0, pady=0)
+        
+        # checkbox_Only_2_batteries.grid(row=13, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+        # checkbox_Only_1_battery.grid(row=14, column=7, padx=(5, 5), pady=(20, 0), sticky="w")
+        # checkbox_both_batteries.grid(row=15, column=7, padx=(5, 5), pady=(20, 0), sticky="w")
+        checkbox_Only_2_batteries.grid(row=14, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+        checkbox_Only_1_battery.grid(row=15, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+        checkbox_both_batteries.grid(row=16, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+        plot_button.grid(row=14, column=8, pady=0, padx=0)
+        parallel_coordinates_plot_button.grid(row=15, column=8, pady=5, padx=0)
+        excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
+        BMS_option_button.grid(row= 11, column= 8, padx=0, pady=0)
+        vertical_line.place(x=832, y=0)
+
         # result_label_desired_values.configure(text=f"Adjust desired targets to see result")
         desired_EV_outputs_title_label.configure(text="Please adjust sliders for desired\nEV outputs")
+        Weightings_sliders_title_label.configure(text="Please adjust sliders for desired\nweightings")
 
         # Set the weighting and desired sliders to start working
         Range_weighting_slider.configure(state="normal")
@@ -228,10 +244,10 @@ def calculate():
 
         
 
-        result_label_weightings.configure(text=f"Options: {options}\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
-        result_label_calculating.configure(text=f"2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
+        result_label_weightings.configure(text=f"Optimal weightings result\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        calculate_button_label.configure(text=f"Options: {options}\n 2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
     else:
-        result_label_calculating.configure(text=f"No combinations found")
+        calculate_button_label.configure(text=f"No combinations found")
         # result_label_weightings.configure(text=f"Press Calculate to see results \n \n \n \n \n ")
         # result_label_desired_values.configure(text=f"Press Calculate to see results \n \n \n \n \n ")
         app.update()
@@ -625,7 +641,7 @@ def on_weighting_slider_release(event=None):
     weighting = [Range_weighting, min_charging_time_weighting, max_discharge_power_weighting, min_pack_mass_weighting, min_charge_power_weighting]
     best_weighted_normaliesed = Compare_Best_Combination_changed_weightings(successful_combinations, weighting)
     if has_calculate_been_pressed == 1:
-        result_label_weightings.configure(text=f"Options: {len(successful_combinations)}\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Optimal weightings result\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
     else:
         result_label_weightings.configure(text="Press Calculate to see results \n \n \n \n \n ")
 
@@ -740,17 +756,36 @@ def make_desired_sliders():
     Desired_range_label = ctk.CTkLabel(app, text=default_weighting[0])
     Desired_range_label.grid(row= 2, column=7)
 
-    Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range: ", 0, 1, 7, math.ceil(max_range_row[10]/10)*10, (math.ceil(max_range_row[10]/10)*10)/2, 0, (math.ceil(max_range_row[10]/10)*10)/5)
+    # Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range (kg): ", 0, 1, 7, math.ceil(max_range_row[10]/10)*10, (math.ceil(max_range_row[10]/10)*10)/2, 0, (math.ceil(max_range_row[10]/10)*10)/5)
+    
+
+    if max_range_row[10] == min_range_row[10]:
+        Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range (km): ", math.ceil(max_range_row[10]), 1, 7, math.ceil(max_range_row[10])+1, math.ceil(max_range_row[10]), math.ceil(max_range_row[10])-1, 2)
+    else:
+        Desired_range_slider, Desired_range_label = Make_Sliders_desired_values(app, "Range (km): ", math.floor(min_range_row[10]), 1, 7, \
+                                                                                    math.ceil(max_range_row[10]), \
+                                                                                    ((math.ceil(max_range_row[10]) - (math.floor(min_range_row[10])))/2) + (math.floor(min_range_row[10])), \
+                                                                                    (math.floor(min_range_row[10])), \
+                                                                                    (math.ceil(max_range_row[10])) - (math.floor(min_range_row[10])))
+    
     Desired_range_slider.configure(command=update_desired_range_label)
     Desired_range_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
-
     # Desired_min_charging_time_slider, Desired_min_charging_time_label = Make_Sliders_desired_values(app, "Charging Time (10-80%) (mins): ", max_charging_time_row[11], 3, 7, (math.ceil(max_charging_time_row[11]/10)*10), (math.ceil(max_charging_time_row[11]/10)*10)/2, 0, (math.ceil(max_charging_time_row[11]/10)*10))
     # Desired_min_charging_time_slider.configure(command=update_desired_min_charging_time_label)
     # Desired_min_charging_time_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
     # print(f"min list: {math.floor(min(list_km_per_min)*10)/10}")
     # print(f"max list: {math.ceil(max(list_km_per_min))}")
 
-    Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", (math.floor(min(list_km_per_min)*10)/10), 3, 7, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))/2, 0, math.ceil(max(list_km_per_min))*10)
+    # Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", (math.floor(min(list_km_per_min))), 3, 7, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))/2, 0, math.ceil(max(list_km_per_min))*10)
+    if min(list_km_per_min) == max(list_km_per_min):
+        Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", math.ceil(max(list_km_per_min)), 3, 7, math.ceil(max(list_km_per_min))+1, math.ceil(max(list_km_per_min)), math.ceil(max(list_km_per_min))-1, 2)
+    else:
+        Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", math.floor(min(list_km_per_min)), 3, 7, \
+                                                                                    math.ceil(max(list_km_per_min)), \
+                                                                                    ((math.ceil(max(list_km_per_min)) - (math.floor(min(list_km_per_min))))/2) + (math.floor(min(list_km_per_min))), \
+                                                                                    (math.floor(min(list_km_per_min))), \
+                                                                                    ((math.ceil(max(list_km_per_min))) - (math.floor(min(list_km_per_min))))*10)
+        
     Desired_km_per_min_slider.configure(command=update_desired_km_per_min_label)
     Desired_km_per_min_slider.bind("<ButtonRelease-1>", on_desired_slider_release)
     # Desired_km_per_min_slider.set((math.floor(min(list_km_per_min)*10)/10))
@@ -1052,9 +1087,7 @@ def BMS_option():
     
     else:
         print("Please select a single option to output")
-
-
-        
+      
 def New_Window():
     global BMS_window, BMS_label
 
@@ -1120,34 +1153,36 @@ EV_front_area_slider.configure(command=update_EV_front_area_label)
 EV_r_r, EV_r_r_slider, EV_r_r_label = Make_Entry_boxes_and_sliders(app, f"EV Rolling Resistance (N): ", car_data[3], 7, 4, 0.04, 0.015, 0, 40, "EV Rolling Resistance (N)")
 EV_r_r_slider.configure(command=update_EV_r_r_label)
 
+def Make_weightings_sliders():
 
-# default_weighting = [1, 1, 1, 1, 1]
+    global Range_weighting_slider, Range_weighting_label, Min_charging_time_weighting_slider, Min_charging_time_weighting_label, max_discharge_power_weighting_slider, max_discharge_power_weighting_label, min_pack_mass_weighting_slider, min_pack_mass_weighting_label, min_charge_power_weighting_slider, min_charge_power_weighting_label
+    # default_weighting = [1, 1, 1, 1, 1]
 
-# Needed to stop the sliders from going off the ends
-# EV_mass = ctk.CTkEntry(app, placeholder_text="EV Mass (kg)", width=160, height=28)
-# EV_mass.grid(row= 1, column= 3, padx=10, pady=10)
-Range_weighting_slider = ctk.CTkSlider(app, from_= 0, to=3, number_of_steps=300)
-Range_weighting_slider.grid(row= 1, column=6, padx=10, pady=10)
-Range_weighting_slider.set(car_data[0])
-# total_energy_slider.configure(command=update_total_energy_label)
-Range_weighting_label = ctk.CTkLabel(app, text=default_weighting[0])
-Range_weighting_label.grid(row= 2, column=6)
+    # Needed to stop the sliders from going off the ends
+    # EV_mass = ctk.CTkEntry(app, placeholder_text="EV Mass (kg)", width=160, height=28)
+    # EV_mass.grid(row= 1, column= 3, padx=10, pady=10)
+    Range_weighting_slider = ctk.CTkSlider(app, from_= 0, to=3, number_of_steps=300)
+    Range_weighting_slider.grid(row= 1, column=6, padx=10, pady=10)
+    Range_weighting_slider.set(car_data[0])
+    # total_energy_slider.configure(command=update_total_energy_label)
+    Range_weighting_label = ctk.CTkLabel(app, text=default_weighting[0])
+    Range_weighting_label.grid(row= 2, column=6)
 
-Range_weighting_slider, Range_weighting_label = Make_Sliders(app, "Range Weighting: ", default_weighting[0], 1, 6, 3, 1.5, 0, 60)
-Range_weighting_slider.configure(command=update_range_weighting_label)
-Range_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
+    Range_weighting_slider, Range_weighting_label = Make_Sliders(app, "Range Weighting: ", default_weighting[0], 1, 6, 3, 1.5, 0, 60)
+    Range_weighting_slider.configure(command=update_range_weighting_label)
+    Range_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
-Min_charging_time_weighting_slider, Min_charging_time_weighting_label = Make_Sliders(app, "Min Charging Time Weighting: ", default_weighting[1], 3, 6, 3, 1.5, 0, 60)
-Min_charging_time_weighting_slider.configure(command=update_min_charging_time_weighting_label)
-Min_charging_time_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
+    Min_charging_time_weighting_slider, Min_charging_time_weighting_label = Make_Sliders(app, "Min Charging Time Weighting: ", default_weighting[1], 3, 6, 3, 1.5, 0, 60)
+    Min_charging_time_weighting_slider.configure(command=update_min_charging_time_weighting_label)
+    Min_charging_time_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
-max_discharge_power_weighting_slider, max_discharge_power_weighting_label = Make_Sliders(app, "Peak Discharge Power Weighting: ", default_weighting[2], 5, 6, 3, 1.5, 0, 60)
-max_discharge_power_weighting_slider.configure(command=update_max_discharge_power_weighting_label)
-max_discharge_power_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
+    max_discharge_power_weighting_slider, max_discharge_power_weighting_label = Make_Sliders(app, "Peak Discharge Power Weighting: ", default_weighting[2], 5, 6, 3, 1.5, 0, 60)
+    max_discharge_power_weighting_slider.configure(command=update_max_discharge_power_weighting_label)
+    max_discharge_power_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
-min_pack_mass_weighting_slider, min_pack_mass_weighting_label = Make_Sliders(app, "Min Pack Mass Weighting: ", default_weighting[3], 7, 6, 3, 1.5, 0, 60)
-min_pack_mass_weighting_slider.configure(command=update_min_pack_mass_weighting_label)
-min_pack_mass_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
+    min_pack_mass_weighting_slider, min_pack_mass_weighting_label = Make_Sliders(app, "Min Pack Mass Weighting: ", default_weighting[3], 7, 6, 3, 1.5, 0, 60)
+    min_pack_mass_weighting_slider.configure(command=update_min_pack_mass_weighting_label)
+    min_pack_mass_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
 
 # # min_charge_power_weighting_slider, min_charge_power_weighting_label = Make_Sliders(app, "Min Charge Power Weighting: ", default_weighting[4], 9, 6, 3, 1.5, 0, 60)
@@ -1182,84 +1217,94 @@ EV_r_r.bind("<KeyRelease>", update_sliders)
 
 # Button to calculate the result
 calc_button = ctk.CTkButton(app, text="Calculate", command=calculate)
-calc_button.grid(row= 11, column= 4, padx=10, pady=0)
+calc_button.grid(row= 10, column= 4, padx=10, pady=0)
 # Scatter plot button
 plot_button = ctk.CTkButton(app, text="Generate Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
-plot_button.grid(row=24, column=3, pady=0, padx=0)
+plot_button.grid(row=14, column=8, pady=10, padx=0)
+plot_button.grid_forget()
 
 parallel_coordinates_plot_button = ctk.CTkButton(app, text="Generate Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations, has_calculate_been_pressed))
-parallel_coordinates_plot_button.grid(row=24, column=4, pady=0, padx=0)
+parallel_coordinates_plot_button.grid(row=15, column=8, pady=10, padx=0)
+parallel_coordinates_plot_button.grid_forget()
 
 # Button to reset the weightings
 reset_weightings_button = ctk.CTkButton(app, text="Reset Weightings", command=reset_weightings)
-reset_weightings_button.grid(row= 11, column= 6, padx=0, pady=0)
+reset_weightings_button.grid(row= 10, column= 6, padx=0, pady=0)
+reset_weightings_button.grid_forget()
 
 # Button to reset the inputs
 reset_inputs_button = ctk.CTkButton(app, text="Reset Inputs", command=reset_inputs)
-reset_inputs_button.grid(row= 11, column= 3, padx=0, pady=0)
+reset_inputs_button.grid(row= 10, column= 3, padx=0, pady=0)
 
 # Button to output data to excel
 excel_output_button = ctk.CTkButton(app, text="Excel Output", command=excel_output)
-excel_output_button.grid(row= 12, column= 3, padx=0, pady=0)
+excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
+excel_output_button.grid_forget()
 
 # Button to determine which BMS to use
 BMS_option_button = ctk.CTkButton(app, text="Determine BMS Option", command=BMS_option)
-BMS_option_button.grid(row= 14, column= 3, padx=0, pady=0)
+BMS_option_button.grid(row= 11, column= 8, padx=0, pady=0)
+BMS_option_button.grid_forget()
 
 
 
 
 # Create a label to display the result
 result_label_weightings = ctk.CTkLabel(app, text=" \n \n \n \n \n ")
-result_label_weightings.grid(row= 12, column= 6, padx=0, pady=5, rowspan=3) 
+result_label_weightings.grid(row= 11, column= 6, padx=0, pady=5, rowspan=3) 
 
 # Create a label to display the result of desired sliders
 result_label_desired_values = ctk.CTkLabel(app, text="")
-result_label_desired_values.grid(row= 12, column= 7, padx=0, pady=5, rowspan=3, sticky="w")
+result_label_desired_values.grid(row= 11, column= 7, padx=0, pady=5, rowspan=3, sticky="w")
 
-result_label_calculating = ctk.CTkLabel(app, text="Press calculate to determine\npotential battery combinations")
-result_label_calculating.grid(row= 12, column= 4, padx=0, pady=5)
+calculate_button_label = ctk.CTkLabel(app, text="Press calculate to determine\npotential battery combinations")
+calculate_button_label.grid(row= 11, column= 4, padx=0, pady=5, rowspan = 2)
 
-desired_EV_label = ctk.CTkLabel(app, text="Please enter desired EV chracteristics values or adjust slider:")
+desired_EV_label = ctk.CTkLabel(app, text="Please enter desired EV chracteristics values or adjust slider:\n ")
 desired_EV_label.grid(row=0, column= 1, columnspan=2, padx=20, pady=10)
 
-EV_metrics_label = ctk.CTkLabel(app, text="Please enter EV metrics values or adjust slider:")
+EV_metrics_label = ctk.CTkLabel(app, text="Please enter EV metrics values or adjust slider:\n")
 EV_metrics_label.grid(row=0, column= 3, columnspan=2, padx=20, pady=10)
 
 desired_EV_outputs_title_label = ctk.CTkLabel(app, text="                        ")
 desired_EV_outputs_title_label.grid(row=0, column= 7, columnspan=1, padx=5, pady=10)
 
-Weightings_sliders_title_label = ctk.CTkLabel(app, text="Please adjust sliders for desired\nweightings")
+Weightings_sliders_title_label = ctk.CTkLabel(app, text="                        ")
 Weightings_sliders_title_label.grid(row=0, column= 6, columnspan=1, padx=5, pady=10)
 
-excel_output_button_label = ctk.CTkLabel(app, text="Press to output data to excel")
-excel_output_button_label.grid(row=13, column= 3, columnspan=1, padx=5, pady=10)
+# excel_output_button_label = ctk.CTkLabel(app, text="Press to output data to excel")
+# excel_output_button_label.grid(row=13, column= 4, columnspan=1, padx=5, pady=10)
 
 
 
 
 
 
-checkbox_Boxes_to_sliders = ctk.CTkCheckBox(app, text="Transfer numbers entered to sliders?", command=update_sliders, variable=ctk.IntVar(value=1))
-checkbox_Boxes_to_sliders.grid(row=22, column=1, padx=(5, 5), pady=(0, 0), sticky="w")
-checkbox_disclamer_label = ctk.CTkLabel(app, text="If un-checked the program will\nuse the box values as default  ")
-checkbox_disclamer_label.grid(row= 23, column= 1, padx=10, pady=0)
+# checkbox_Boxes_to_sliders = ctk.CTkCheckBox(app, text="Transfer numbers entered to sliders?", command=update_sliders, variable=ctk.IntVar(value=1))
+# checkbox_Boxes_to_sliders.grid(row=22, column=1, padx=(5, 5), pady=(0, 0), sticky="w")
+# checkbox_disclamer_label = ctk.CTkLabel(app, text="If un-checked the program will\nuse the box values as default  ")
+# checkbox_disclamer_label.grid(row= 23, column= 1, padx=10, pady=0)
 
 # selected_option = ctk.IntVar(value=0)
 
 checkbox_Only_2_batteries = ctk.CTkCheckBox(app, text="Only show 2 battery options", command=lambda: check_selected(1))#, variable=selected_option, onvalue=1, offvalue=0)
-checkbox_Only_2_batteries.grid(row=22, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+checkbox_Only_2_batteries.grid(row=15, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+checkbox_Only_2_batteries.grid_forget()
 
 checkbox_Only_1_battery = ctk.CTkCheckBox(app, text="Only show 1 battery options", command=lambda: check_selected(2))#, variable=selected_option, onvalue=1, offvalue=0)
-checkbox_Only_1_battery.grid(row=23, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+checkbox_Only_1_battery.grid(row=16, column=7, padx=(5, 5), pady=(10, 0), sticky="w")
+
+checkbox_Only_1_battery.grid_forget()
 
 checkbox_both_batteries = ctk.CTkCheckBox(app, text="Show all battery options", command=lambda: check_selected(3), variable=ctk.IntVar(value=1))#, variable=selected_option, onvalue=1, offvalue=0)
-checkbox_both_batteries.grid(row=24, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
+checkbox_both_batteries.grid(row=17, column=7, padx=(5, 5), pady=(10, 0), sticky="w")
+checkbox_both_batteries.grid_forget()
 
 
 # Verticle lines
 vertical_line = ctk.CTkFrame(app, width=2, height=475, fg_color="gray")
-vertical_line.place(x=883, y=0)
+vertical_line.place(x=832, y=0)
+vertical_line.grid_forget()
 
 
 # Start the main event loop
