@@ -1,7 +1,10 @@
 import customtkinter as ctk
 import math
 import pandas as pd 
+import os
+
 from openpyxl import load_workbook
+from datetime import datetime
 # import matplotlib.pyplot as plt
 # from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
@@ -223,6 +226,7 @@ def calculate():
         plot_button.grid(row=14, column=8, pady=0, padx=0)
         parallel_coordinates_plot_button.grid(row=15, column=8, pady=5, padx=0)
         excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
+        excel_output_all_button.grid(row= 9, column= 8, padx=0, pady=0)
         BMS_option_button.grid(row= 11, column= 8, padx=0, pady=0)
         vertical_line.place(x=832, y=0)
 
@@ -880,6 +884,91 @@ def excel_output():
         print("Please select a single option to output")
     
     # existing_book.save(file_path)
+
+
+
+def excel_output_all():
+
+    desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
+    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+
+    desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
+    slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
+
+    for i in range(len(desired_EV_characteristics)):
+        # print(desired_EV_characteristics[i])
+
+        if desired_EV_characteristics[i] == "":
+            desired_EV_characteristics[i] = slider_values[i]
+        elif i == 1: 
+            try: desired_EV_characteristics[i] = float(total_energy.get())
+            except: print("non number entered in energy")
+        elif i == 2: 
+            try: desired_EV_characteristics[i] = float(Pack_mass.get())
+            except: print("non number entered in pack mass")
+        elif i == 3: 
+            try: desired_EV_characteristics[i] = float(Max_V.get())
+            except: print("non number entered in max voltage")
+        elif i == 4: 
+            try: desired_EV_characteristics[i] = float(Min_V.get())
+            except: print("non number entered in min voltage")
+        elif i == 5: 
+            try: desired_EV_characteristics[i] = float(Discharging_power.get())
+            except: print("non number entered in discharging")
+        elif i == 6: 
+            try: desired_EV_characteristics[i] = float(Charging_power.get())
+            except: 
+                print("non number entered in charging")
+
+     
+
+    full_data = []
+    
+    for i in range(len(matching_rows)):
+        
+        data = {'Range (km)': matching_rows[i][10], 'Charging time (10-80%)': matching_rows[i][11], 'Charging speed (km/min)': (0.8*matching_rows[i][10] - 0.1*matching_rows[i][10])/matching_rows[i][11],\
+                'Max discharging power (kW)': (matching_rows[i][7]/1000), 'Min pack mass (kg)': matching_rows[i][8], 'Max charging power (kW)': (matching_rows[i][9]/1000),\
+                'Pack energy (kWh)': (matching_rows[i][6]/1000), 'Battery 1': matching_rows[i][0], 'Series 1': matching_rows[i][1], 'Parallel 1': matching_rows[i][2], \
+                'Battery 2': matching_rows[i][3], 'Series 2': matching_rows[i][4], 'Parallel 2': matching_rows[i][5], 'EV mass without pack (kg)': car_data[0], \
+                'EV drag coefficient': car_data[1], 'EV frontal area (m²)': car_data[2], 'EV rolling resistance (N)': car_data[3], \
+                'Required pack energy (kWh)': (desired_EV_characteristics[1]/1000), 'Pack mass (kg)': desired_EV_characteristics[2], 'Max voltage (V)': desired_EV_characteristics[3], 'Min voltage (V)': desired_EV_characteristics[4], \
+                'Required discharging power (kW)': (desired_EV_characteristics[5]/1000), 'Required charging power (kW)': (desired_EV_characteristics[6]/1000)}
+        
+        full_data.append(data)
+
+    # columns = ['Range (km)', 'Charging time(10-80%)', 'Charging speed (km/min)', 'Max discharging power', 'Min pack mass',
+    #        'Max charging power', 'Actual Energy', 'Battery 1', 'Series Bat 1', 'Parallel bat 1',
+    #        'Battery 2', 'Series bat 2', 'Parallel bat 2', 'EV mass without pack',
+    #        'EV drag coefficient', 'EV frontal area', 'EV rolling resistance',
+    #        'Total energy', 'Pack mass', 'Max V', 'Min V',
+    #        'Discharging power', 'Charging power']
+    
+    df = pd.DataFrame(full_data)#, columns=columns)
+
+    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_path = os.path.join(f"Outputs", f"Output_{timestamp}.xlsx")
+    # sheet_name = 'Outputted Data'
+    df.to_excel(file_path, index=False)
+
+
+
+    # # Load existing workbook
+    # try:
+    #     existing_book = load_workbook(file_path)
+    #     with pd.ExcelWriter(file_path, engine='openpyxl', mode='a', if_sheet_exists='overlay') as writer:
+    #         # Position the new data at the bottom of the existing sheet
+    #         start_row = existing_book[sheet_name].max_row
+    #         df.to_excel(writer, sheet_name=sheet_name, startrow=start_row, startcol=1, index=False, header=False)
+    # except FileNotFoundError:
+    #     # If file doesn't exist, create a new file
+    #     with pd.ExcelWriter(file_path, engine='openpyxl', mode='w') as writer:
+    #         df.to_excel(writer, sheet_name=sheet_name, index=False)
+    
+    print("Printed to file")
+        
+   
+    
+    # existing_book.save(file_path)
     
 
 def BMS_option():
@@ -1240,6 +1329,10 @@ reset_inputs_button.grid(row= 10, column= 3, padx=0, pady=0)
 excel_output_button = ctk.CTkButton(app, text="Excel Output", command=excel_output)
 excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
 excel_output_button.grid_forget()
+
+excel_output_all_button = ctk.CTkButton(app, text="Excel Output All", command=excel_output_all)
+excel_output_all_button.grid(row= 9, column= 8, padx=0, pady=0)
+excel_output_all_button.grid_forget()
 
 # Button to determine which BMS to use
 BMS_option_button = ctk.CTkButton(app, text="Determine BMS Option", command=BMS_option)
