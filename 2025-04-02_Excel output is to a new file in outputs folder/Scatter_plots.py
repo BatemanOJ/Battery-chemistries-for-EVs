@@ -16,13 +16,6 @@ def plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat):
         # Create a new figure
         fig, ax = plt.subplots()
 
-        # Ensure the figure is closed properly when the window is closed
-        def on_close():
-            plt.close(fig)  # Close the Matplotlib figure
-            plot_window.destroy()  # Destroy the window
-
-        plot_window.protocol("WM_DELETE_WINDOW", on_close)  # Handle close event
-
         # print(f"successful_combinations_1_bat: {successful_combinations_1_bat}, successful_combinations_2_bat: {successful_combinations_2_bat}")
 
         

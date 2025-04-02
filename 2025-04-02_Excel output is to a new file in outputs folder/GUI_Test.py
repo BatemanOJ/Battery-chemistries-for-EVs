@@ -248,7 +248,7 @@ def calculate():
 
         
 
-        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Optimal weightings result\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
         calculate_button_label.configure(text=f"Options: {options}\n 2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
     else:
         calculate_button_label.configure(text=f"No combinations found")
@@ -348,7 +348,7 @@ def update_Charging_power_label(value):
     Charging_power_label.configure(text=f"Charging Power (W): {float(value):.0f}")
 
 def update_Volume_label(value):
-    Volume_label.configure(text=f"Pack Volume (m³): {float(value):.3f}")
+    Volume_label.configure(text=f"Volume (m³): {float(value):.3f}")
 
 def update_EV_mass_label(value):
     EV_mass_label.configure(text=f"EV Mass (kg): {float(value):.0f}")
@@ -645,7 +645,7 @@ def on_weighting_slider_release(event=None):
     weighting = [Range_weighting, min_charging_time_weighting, max_discharge_power_weighting, min_pack_mass_weighting, min_charge_power_weighting]
     best_weighted_normaliesed = Compare_Best_Combination_changed_weightings(successful_combinations, weighting)
     if has_calculate_been_pressed == 1:
-        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Optimal weightings result\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
     else:
         result_label_weightings.configure(text="Press Calculate to see results \n \n \n \n \n ")
 
@@ -1205,7 +1205,7 @@ Max_V, Max_V_slider, Max_V_label = Make_Entry_boxes_and_sliders(app, f"Maximum V
 Min_V, Min_V_slider, Min_V_label = Make_Entry_boxes_and_sliders(app, f"Minimum Voltage (V): ", input_min_V, 7, 2, 600, 300, 0, 120, "Minimum Voltage (V)")
 Discharging_power, Discharging_power_slider, Discharging_power_label = Make_Entry_boxes_and_sliders(app, f"Discharging Power (W): ", input_discharging_power, 9, 2, 500000, 250000, 0, 500, "Peak Discharging Power (W)")
 Charging_power, Charging_power_slider, Charging_power_label = Make_Entry_boxes_and_sliders(app, f"Charging Power (W): ", input_charging_power, 11, 2, 300000, 150000, 0, 300, "Peak Charging Power (W)")
-Volume, Volume_slider, Volume_label = Make_Entry_boxes_and_sliders(app, f"Pack Volume (m³): ", input_max_volume, 13, 2, 2, 1, 0, 400, "Pack Volume (m³)")
+Volume, Volume_slider, Volume_label = Make_Entry_boxes_and_sliders(app, f"Volume (m³): ", input_max_volume, 13, 2, 2, 1, 0, 400, "Volume (m³)")
 
 # EV_range_slider.configure(command=update_range_label)
 total_energy_slider.configure(command=update_total_energy_label)
