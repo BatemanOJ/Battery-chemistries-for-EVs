@@ -787,7 +787,7 @@ def make_desired_sliders():
         Desired_km_per_min_slider, Desired_km_per_min_label = Make_Sliders_desired_values(app, "Charging speed (km/min): ", math.floor(min(list_km_per_min)), 3, 7, \
                                                                                     math.ceil(max(list_km_per_min)), \
                                                                                     ((math.ceil(max(list_km_per_min)) - (math.floor(min(list_km_per_min))))/2) + (math.floor(min(list_km_per_min))), \
-                                                                                    (math.floor(min(list_km_per_min))), \
+                                                                                    0, #(math.floor(min(list_km_per_min))), \
                                                                                     ((math.ceil(max(list_km_per_min))) - (math.floor(min(list_km_per_min))))*10)
         
     Desired_km_per_min_slider.configure(command=update_desired_km_per_min_label)
@@ -821,9 +821,8 @@ def make_desired_sliders():
 
 def excel_output():
 
-    desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
-    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
-
+    desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
+    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
     desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
     slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]
 
@@ -855,7 +854,8 @@ def excel_output():
      
     if len(matching_rows) == 1:
         
-        data = {'Range': [matching_rows[0][10]], 'Charging time(10-80%)': [matching_rows[0][11]], 'Max discharging power': [matching_rows[0][7]], 'Min pack mass': [matching_rows[0][8]],\
+        data = {'Range': [matching_rows[0][10]], 'Charging time(10-80%)': [matching_rows[0][11]], 'Charging speed (km/min)': (0.8*matching_rows[0][10] - 0.1*matching_rows[0][10])/matching_rows[0][11], \
+                'Max discharging power': [matching_rows[0][7]], 'Min pack mass': [matching_rows[0][8]],\
                 'Max charging power': [matching_rows[0][9]], 'Actual Energy': [matching_rows[0][6]], 'Battery 1': [matching_rows[0][0]], 'Series Bat 1': [matching_rows[0][1]], 'Parallel bat 1': [matching_rows[0][2]], \
                 'Battery 2': [matching_rows[0][3]], 'Series bat 2': [matching_rows[0][4]], 'Parallel bat 2': [matching_rows[0][5]], 'EV mass without pack': [car_data[0]], \
                 'EV drag coefficient': [car_data[1]], 'EV frontal area': [car_data[2]], 'EV rolling resistance': [car_data[3]], \
@@ -889,8 +889,8 @@ def excel_output():
 
 def excel_output_all():
 
-    desired_values = [desired_range, desired_min_charging_time, desired_max_discharging_power, desired_max_mass]
-    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and row[11] <= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+    desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
+    matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
 
     desired_EV_characteristics = [0, total_energy.get(), Pack_mass.get(), Max_V.get(), Min_V.get(), Discharging_power.get(), Charging_power.get()]
     slider_values = [0, float(total_energy_slider.get()), float(Pack_mass_slider.get()), float(Max_V_slider.get()), float(Min_V_slider.get()),float(Discharging_power_slider.get()), float(Charging_power_slider.get())]

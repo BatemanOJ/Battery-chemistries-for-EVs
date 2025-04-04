@@ -200,7 +200,6 @@ def Find_Two_Battery_Options_Test_with_removed(battery_data, req_energy, req_dis
 
         # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
 
-        # print(f"Battery 1 Index: {battery_1_index} Battery 2 Index: {battery_2_index}")
         multi_bat_success, battery_1_series, battery_1_parallel, battery_2_series, battery_2_parallel, energy, discharging_power, mass, charging_power, battery_volume = \
         Two_Chem_Efficient_Battery_Mass_Not_Pack(battery_data[f"battery_{battery_1_index}_index"], battery_data[f"battery_{battery_2_index}_index"],\
                                                 req_energy, req_discharging_power, req_max_V, req_min_V, req_max_mass_battery, req_charging_power, max_volume)
