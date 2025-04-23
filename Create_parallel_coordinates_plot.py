@@ -14,6 +14,10 @@ def create_parallel_coordinates_plot(successful_combinations, has_calculate_been
         
         transposed_data = [list(t) for t in zip(*successful_combinations)]
         # print(transposed_data[10])
+        power_in_kw = []
+
+        for i in range(0, len(successful_combinations)):
+            power_in_kw.append(successful_combinations[i][7] / 1000) # Convert to kW
 
         list_km_per_min = []
         for i in range(0, len(successful_combinations)):
@@ -22,7 +26,7 @@ def create_parallel_coordinates_plot(successful_combinations, has_calculate_been
 
         Range = np.array(transposed_data[10])
         km_per_min = np.array(list_km_per_min)
-        Max_discharging_power = np.array(transposed_data[7])
+        Max_discharging_power = np.array(power_in_kw) # Convert to kW
         Min_pack_mass = np.array(transposed_data[8])
 
         # print(f"km_per_min: {km_per_min}")
@@ -30,7 +34,7 @@ def create_parallel_coordinates_plot(successful_combinations, has_calculate_been
         df = pd.DataFrame({
             'Range (km)': Range,
             'Charging speed (km/min)': km_per_min, 
-            'Max discharging power (W)': Max_discharging_power,
+            'Max discharging power (kW)': Max_discharging_power,
             'Min pack mass (kg)': Min_pack_mass
         })
 
@@ -43,7 +47,7 @@ def create_parallel_coordinates_plot(successful_combinations, has_calculate_been
         })
 
         fig = px.parallel_coordinates(df, 
-                                dimensions=['Min pack mass (kg)', 'Range (km)', 'Charging speed (km/min)', 'Max discharging power (W)'],
+                                dimensions=['Min pack mass (kg)', 'Range (km)', 'Charging speed (km/min)', 'Max discharging power (kW)'],
                                 color='Range (km)',
                                 color_continuous_scale=px.colors.diverging.Tealrose)
         fig.show()

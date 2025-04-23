@@ -12,7 +12,7 @@ from Main_Code_2 import Calculate_Possible_Combinations
 from Set_Default_Values import Set_Default_Values_For_GUI, Values_From_Boxes
 from Entry_boxes_and_sliders import Make_Entry_boxes_and_sliders, Make_Sliders, Make_Sliders_desired_values, Make_Sliders_1_sf
 from Compare_Best_Combinations import Compare_Best_Combination_changed_weightings
-from Scatter_plots import plot_scatter
+from Scatter_plots import plot_scatter, plot_scatter_current_options
 from Create_parallel_coordinates_plot import create_parallel_coordinates_plot
 from Get_battery_and_WLTP_data import Get_battery_and_WLTP_data
 from Range_Estimation import Range_Estimation_for_Each_Battery
@@ -224,9 +224,10 @@ def calculate():
         checkbox_Only_1_battery.grid(row=15, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
         checkbox_both_batteries.grid(row=16, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
         plot_button.grid(row=14, column=8, pady=0, padx=0)
-        parallel_coordinates_plot_button.grid(row=15, column=8, pady=5, padx=0)
-        excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
-        excel_output_all_button.grid(row= 9, column= 8, padx=0, pady=0)
+        plot_button_current_options.grid(row=15, column=8, pady=10, padx=0)
+        parallel_coordinates_plot_button.grid(row=16, column=8, pady=5, padx=0)
+        excel_output_button.grid(row= 9, column= 8, padx=0, pady=0)
+        excel_output_all_button.grid(row= 11, column= 8, padx=0, pady=0)
         BMS_option_button.grid(row= 11, column= 8, padx=0, pady=0)
         vertical_line.place(x=832, y=0)
 
@@ -247,8 +248,8 @@ def calculate():
         # min_charging_time_slider.configure(state="normal")
 
         
-
-        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins)\nMax discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW)\nMin pack mass: {best_weighted_normaliesed[8]:.0f}(kg)\nMax charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        
+        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km)\nCharging speed: {((0.8*best_weighted_normaliesed[10] - 0.1*best_weighted_normaliesed[10])/best_weighted_normaliesed[11]):.0f}(km/min) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
         calculate_button_label.configure(text=f"Options: {options}\n 2 battery combinations: {count_successful_combinations_2_bat}\n1 battery combinations: {count_successful_combinations_1_bat}")
     else:
         calculate_button_label.configure(text=f"No combinations found")
@@ -645,7 +646,7 @@ def on_weighting_slider_release(event=None):
     weighting = [Range_weighting, min_charging_time_weighting, max_discharge_power_weighting, min_pack_mass_weighting, min_charge_power_weighting]
     best_weighted_normaliesed = Compare_Best_Combination_changed_weightings(successful_combinations, weighting)
     if has_calculate_been_pressed == 1:
-        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging time(10-80%): {best_weighted_normaliesed[11]:.0f}(mins) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
+        result_label_weightings.configure(text=f"Optimal weightings result:\nRange: {best_weighted_normaliesed[10]:.2f}(km) \n Charging speed: {((0.8*best_weighted_normaliesed[10] - 0.1*best_weighted_normaliesed[10])/best_weighted_normaliesed[11]):.0f}(km/min) \n Max discharging power: {(best_weighted_normaliesed[7]/1000):.0f}(kW) \n Min pack mass: {best_weighted_normaliesed[8]:.0f}(kg) \n Max charging power: {(best_weighted_normaliesed[9]/1000):.0f}(kW)")
     else:
         result_label_weightings.configure(text="Press Calculate to see results \n \n \n \n \n ")
 
@@ -657,7 +658,7 @@ def reset_weightings():
     # min_charge_power_weighting_slider.set(default_weighting[4])
 
     Range_weighting_label.configure(text=f"Range Weighting: {default_weighting[0]}")
-    Min_charging_time_weighting_label.configure(text=f"Min Charging Time Weighting: {default_weighting[1]}")
+    Min_charging_time_weighting_label.configure(text=f"Max Charging Speed Weighting: {default_weighting[1]}")
     max_discharge_power_weighting_label.configure(text=f"Max Discharge Power Weighting: {default_weighting[2]}")
     min_pack_mass_weighting_label.configure(text=f"Min Pack Mass Weighting: {default_weighting[3]}")
     # min_charge_power_weighting_label.configure(text=f"Min Charge Power Weighting: {default_weighting[4]}")
@@ -721,7 +722,8 @@ def on_desired_slider_release(event=None):
     desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
     print(desired_values, has_calculate_been_pressed)
     if has_calculate_been_pressed == 1:
-        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
+        matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1]\
+                         and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
         if matching_rows:
             
             # print(f"Matching rows length: {len(matching_rows)}")
@@ -974,12 +976,6 @@ def excel_output_all():
 def BMS_option():
 
     battery_data, WLTP_data = Get_battery_and_WLTP_data()
-
-    # desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
-    # print(desired_values, has_calculate_been_pressed)
-    # if has_calculate_been_pressed == 1:
-    #     matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
-    #     if matching_rows:
     
     desired_values = [desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass]
     matching_rows = [row for row in successful_combinations if row[10] >= desired_values[0] and (0.8*row[10] - 0.1*row[10])/row[11] >= desired_values[1] and row[7]/1000 >= desired_max_discharging_power and row[8] <= desired_max_mass]
@@ -1067,18 +1063,18 @@ def BMS_option():
             Gemini_2 = 1
 
         
-        if (Range_battery_1 < 48 and total_range > 150 and Power_battery_2 < req_power):
+        # if (Range_battery_1 < 8 and total_range > 150 and Power_battery_2 < req_power):
+        #         HEV_1 = 1 # Have to use HEV because the range is so low on one battery that it can only be used as a power boost
+        # if (Range_battery_2 < 8 and total_range > 150 and Power_battery_1 < req_power):
+        #         HEV_2 = 1
+        if (Range_battery_1 < Range_battery_2 and Power_battery_2 < req_power and battery_1_cycles > 2500):
                 HEV_1 = 1 # Have to use HEV because the range is so low on one battery that it can only be used as a power boost
-        if (Range_battery_2 < 48 and total_range > 150 and Power_battery_1 < req_power):
-                HEV_2 = 1
-        if (Range_battery_1 < (total_range*0.25) and Power_battery_2 < req_power and total_range < 150):
-                HEV_1 = 1 # Have to use HEV because the range is so low on one battery that it can only be used as a power boost
-        if (Range_battery_2 < (total_range*0.25) and Power_battery_1 < req_power and total_range < 150):
+        if (Range_battery_2 < Range_battery_1 and Power_battery_1 < req_power and battery_2_cycles > 2500):
                 HEV_2 = 1
         
-        if (Power_battery_1 > req_power and Power_battery_2 < req_power and Range_battery_1 > 48.28 and Range_battery_2 > Range_battery_1):
+        if (Power_battery_1 > req_power and Range_battery_1 > 48.28 and Range_battery_2 > Range_battery_1 and battery_1_cycles > 2000):
             PHEV_1 = 1
-        if (Power_battery_2 > req_power and Power_battery_1 < req_power and Range_battery_2 > 48.28 and Range_battery_2 < Range_battery_1):
+        if (Power_battery_2 > req_power and Range_battery_2 > 48.28 and Range_battery_2 < Range_battery_1 and battery_2_cycles > 2000):
             PHEV_2 = 1
 
         if (Gemini_1 + Gemini_2 + PHEV_1 + PHEV_2 + HEV_1 + HEV_2) == 0:
@@ -1261,7 +1257,7 @@ def Make_weightings_sliders():
     Range_weighting_slider.configure(command=update_range_weighting_label)
     Range_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
-    Min_charging_time_weighting_slider, Min_charging_time_weighting_label = Make_Sliders(app, "Min Charging Time Weighting: ", default_weighting[1], 3, 6, 3, 1.5, 0, 60)
+    Min_charging_time_weighting_slider, Min_charging_time_weighting_label = Make_Sliders(app, "Max Charging Speed Weighting: ", default_weighting[1], 3, 6, 3, 1.5, 0, 60)
     Min_charging_time_weighting_slider.configure(command=update_min_charging_time_weighting_label)
     Min_charging_time_weighting_slider.bind("<ButtonRelease-1>", on_weighting_slider_release)
 
@@ -1308,12 +1304,17 @@ EV_r_r.bind("<KeyRelease>", update_sliders)
 calc_button = ctk.CTkButton(app, text="Calculate", command=calculate)
 calc_button.grid(row= 10, column= 4, padx=10, pady=0)
 # Scatter plot button
-plot_button = ctk.CTkButton(app, text="Generate Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
+plot_button = ctk.CTkButton(app, text="All Options Scatter Plot", command=lambda: plot_scatter(successful_combinations_1_bat, successful_combinations_2_bat))
 plot_button.grid(row=14, column=8, pady=10, padx=0)
 plot_button.grid_forget()
 
-parallel_coordinates_plot_button = ctk.CTkButton(app, text="Generate Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations, has_calculate_been_pressed))
-parallel_coordinates_plot_button.grid(row=15, column=8, pady=10, padx=0)
+plot_button_current_options = ctk.CTkButton(app, text="Current Options Scatter Plot", command=lambda: plot_scatter_current_options(successful_combinations_1_bat, successful_combinations_2_bat, \
+                                                                                                            desired_range, desired_km_per_min, desired_max_discharging_power, desired_max_mass))
+plot_button_current_options.grid(row=15, column=8, pady=0, padx=0)
+plot_button_current_options.grid_forget()
+
+parallel_coordinates_plot_button = ctk.CTkButton(app, text="Parallel Coordinates Plot", command=lambda: create_parallel_coordinates_plot(successful_combinations, has_calculate_been_pressed))
+parallel_coordinates_plot_button.grid(row=16, column=8, pady=0, padx=0)
 parallel_coordinates_plot_button.grid_forget()
 
 # Button to reset the weightings
@@ -1327,11 +1328,11 @@ reset_inputs_button.grid(row= 10, column= 3, padx=0, pady=0)
 
 # Button to output data to excel
 excel_output_button = ctk.CTkButton(app, text="Excel Output", command=excel_output)
-excel_output_button.grid(row= 10, column= 8, padx=0, pady=0)
+excel_output_button.grid(row= 9, column= 8, padx=0, pady=0)
 excel_output_button.grid_forget()
 
-excel_output_all_button = ctk.CTkButton(app, text="Excel Output All", command=excel_output_all)
-excel_output_all_button.grid(row= 9, column= 8, padx=0, pady=0)
+excel_output_all_button = ctk.CTkButton(app, text="Excel Output", command=excel_output_all)
+excel_output_all_button.grid(row= 10, column= 8, padx=0, pady=0)
 excel_output_all_button.grid_forget()
 
 # Button to determine which BMS to use
@@ -1385,12 +1386,12 @@ checkbox_Only_2_batteries.grid(row=15, column=7, padx=(5, 5), pady=(0, 0), stick
 checkbox_Only_2_batteries.grid_forget()
 
 checkbox_Only_1_battery = ctk.CTkCheckBox(app, text="Only show 1 battery options", command=lambda: check_selected(2))#, variable=selected_option, onvalue=1, offvalue=0)
-checkbox_Only_1_battery.grid(row=16, column=7, padx=(5, 5), pady=(10, 0), sticky="w")
+checkbox_Only_1_battery.grid(row=16, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
 
 checkbox_Only_1_battery.grid_forget()
 
 checkbox_both_batteries = ctk.CTkCheckBox(app, text="Show all battery options", command=lambda: check_selected(3), variable=ctk.IntVar(value=1))#, variable=selected_option, onvalue=1, offvalue=0)
-checkbox_both_batteries.grid(row=17, column=7, padx=(5, 5), pady=(10, 0), sticky="w")
+checkbox_both_batteries.grid(row=17, column=7, padx=(5, 5), pady=(0, 0), sticky="w")
 checkbox_both_batteries.grid_forget()
 
 

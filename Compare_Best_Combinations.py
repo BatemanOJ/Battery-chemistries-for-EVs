@@ -185,6 +185,8 @@ def Compare_Best_Combination_changed_weightings(successful_combinations, weighti
     average_discharging_power = sum(x[7] for x in successful_combinations)/len(successful_combinations)
     average_charging_power = sum(x[9] for x in successful_combinations)/len(successful_combinations)
     average_min_charging_time = sum(x[11] for x in successful_combinations)/len(successful_combinations)
+    average_max_charging_speed = sum(((0.8*x[10] - 0.1*x[10])/x[11]) for x in successful_combinations)/len(successful_combinations)
+
     average_std_charging_time = sum(x[12] for x in successful_combinations)/len(successful_combinations)
     average_max_charging_power = sum(x[13] for x in successful_combinations)/len(successful_combinations)
 
@@ -193,6 +195,7 @@ def Compare_Best_Combination_changed_weightings(successful_combinations, weighti
     median_discharging_power = statistics.median(x[7] for x in successful_combinations)
     median_charging_power = statistics.median(x[9] for x in successful_combinations)
     median_min_charging_time = statistics.median(x[11] for x in successful_combinations)
+    median_max_charging_speed = statistics.median(((0.8*x[10] - 0.1*x[10])/x[11]) for x in successful_combinations)
     median_std_charging_time = statistics.median(x[12] for x in successful_combinations)
     median_max_charging_power = statistics.median(x[13] for x in successful_combinations)
 
@@ -204,7 +207,8 @@ def Compare_Best_Combination_changed_weightings(successful_combinations, weighti
     charging_powers = []
     discharging_powers = [] 
     masses = []
-    min_charging_times =[]
+    min_charging_times = []
+    max_charging_speed_difference = []
 
     for i in range(len(successful_combinations)):
         range_difference = (successful_combinations[i][10] / median_range) - 1
@@ -212,18 +216,21 @@ def Compare_Best_Combination_changed_weightings(successful_combinations, weighti
         discharging_power_difference = (successful_combinations[i][7] / median_discharging_power) - 1
         mass_difference = 1 - (successful_combinations[i][8] / median_mass) # Invert mass since lower is better
         min_charging_times_difference = 1 - (successful_combinations[i][11] / median_min_charging_time) # Invert charging time since lower is better
+        median_max_charging_speed_difference = (((0.8*successful_combinations[i][10] - 0.1*successful_combinations[i][10])/successful_combinations[i][11]) / median_max_charging_speed) - 1
 
         ranges.append(range_difference)
         charging_powers.append(charging_power_difference)
         discharging_powers.append(discharging_power_difference)
         masses.append(mass_difference)
         min_charging_times.append(min_charging_times_difference)
+        max_charging_speed_difference.append(median_max_charging_speed_difference)
 
     normalise_ranges = normalise(ranges)
     normalise_charging_powers = normalise(charging_powers)
     normalise_discharging_powers = normalise(discharging_powers)
     normalise_masses = normalise(masses)
     normalise_min_charging_times = normalise(min_charging_times)
+    normalise_max_charging_speed_difference = normalise(max_charging_speed_difference)
 
     for i in range(len(successful_combinations)):
         norm_range_difference = normalise_ranges[i]
@@ -231,11 +238,12 @@ def Compare_Best_Combination_changed_weightings(successful_combinations, weighti
         norm_discharging_power_difference = normalise_discharging_powers[i]
         norm_mass_difference = normalise_masses[i]  
         norm_min_charging_times_difference = normalise_min_charging_times[i]
+        norm_max_charging_speed_difference = normalise_max_charging_speed_difference[i]
 
         # Apply weights (adjustable)
         weighted_total_normalised = (
             norm_range_difference * weightings[0] +
-            norm_min_charging_times_difference * weightings[1] +
+            norm_max_charging_speed_difference * weightings[1] +
             norm_discharging_power_difference * weightings[2] +
             norm_mass_difference * weightings[3] 
             # norm_charging_power_difference* weightings[4]
